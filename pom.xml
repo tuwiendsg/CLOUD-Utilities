@@ -11,6 +11,7 @@
 	<name>COMOT Utilities</name>
 	
 	<modules>
+		<module>messaging-api</module>
 		<module>comot-messaging</module>
 	</modules>
 </project>
