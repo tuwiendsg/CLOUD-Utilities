@@ -5,6 +5,8 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.lightweight;
 
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
+
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
@@ -12,5 +14,13 @@ package at.ac.tuwien.dsg.comot.messaging.lightweight;
 public class ComotMessagingFactory {
 	public static RabbitMqConsumerFactory getRabbitMqConsumer() {
 		return new RabbitMqConsumerFactory();
+	}
+	
+	public static RabbitMqProducerFactory getRabbitMqProducer() {
+		return new RabbitMqProducerFactory();
+	}
+	
+	public static RabbitMqMessage getRabbitMqMessage() {
+		return new RabbitMqMessage();
 	}
 }
