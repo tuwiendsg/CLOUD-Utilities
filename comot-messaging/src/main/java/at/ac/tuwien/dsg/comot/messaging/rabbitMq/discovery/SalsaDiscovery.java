@@ -15,6 +15,7 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.rabbitMq.discovery;
 
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.discovery.ADiscovery;
 import at.ac.tuwien.dsg.comot.messaging.rabbitMq.orchestrator.RabbitMQServerCluster;
 import at.ac.tuwien.dsg.comot.messaging.util.Config;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.AssociatedVM;

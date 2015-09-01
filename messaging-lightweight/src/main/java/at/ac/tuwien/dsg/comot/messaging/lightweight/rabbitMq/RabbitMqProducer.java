@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.rabbitMq;
+package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq;
 
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.channel.SendingChannel;
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import at.ac.tuwien.dsg.comot.messaging.api.Producer;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.SendingChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

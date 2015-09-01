@@ -13,5 +13,6 @@
 	<modules>
 		<module>messaging-api</module>
 		<module>comot-messaging</module>
+	 <module>messaging-lightweight</module>
 	</modules>
 </project>

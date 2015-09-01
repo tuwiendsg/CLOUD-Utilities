@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.rabbitMq.channel;
+package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel;
 
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.RabbitMqMessage;
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.discovery.ADiscovery;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.discovery.ADiscovery;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;

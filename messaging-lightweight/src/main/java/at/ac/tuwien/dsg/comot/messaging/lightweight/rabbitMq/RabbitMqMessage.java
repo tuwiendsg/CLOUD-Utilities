@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright 2015 Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,55 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.rabbitMq;
+package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq;
 
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
- *
+ * 
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class TypeHandler<T extends TypeHandler<T>> implements Serializable {
+public class RabbitMqMessage extends TypeHandler<RabbitMqMessage> implements Message, Serializable {
 	
-	private List<String> types = new ArrayList<>();
-	
-	public synchronized T withType(String type) {
-		this.types.add(type);
-		return (T)this;
+	private byte[] content;
+
+	@Override
+	public RabbitMqMessage setMessage(byte[] content) {
+		this.content = content;
+		return this;
 	}
-	
-	public List<String> getTypes() {
-		return Collections.unmodifiableList(this.types);
+
+	@Override
+	public byte[] getMessage() {
+		return content;
 	}
 	
 	@Override
 	public boolean equals(Object o) {
+		
 		if(o == null) {
 			return false;
 		}
 		
-		if(!(o instanceof TypeHandler)) {
+		if(!(o instanceof RabbitMqMessage)){
 			return false;
 		}
 		
-		TypeHandler typeHandle = (TypeHandler)o;
+		RabbitMqMessage msg = (RabbitMqMessage)o;
 		
 		return new EqualsBuilder()
-				.append(types.toArray(), typeHandle.types.toArray())
+				.appendSuper(super.equals(msg))
+				.append(content, msg.content)
 				.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		int hash = 3;
-		hash = 89 * hash + Objects.hashCode(this.types);
+		int hash = super.hashCode();
+		hash = 37 * hash + Arrays.hashCode(this.content);
 		return hash;
 	}
 }

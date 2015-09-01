@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.rabbitMq;
+package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq;
 
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.channel.ReceivingChannel;
 import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import at.ac.tuwien.dsg.comot.messaging.api.MessageReceivedListener;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;

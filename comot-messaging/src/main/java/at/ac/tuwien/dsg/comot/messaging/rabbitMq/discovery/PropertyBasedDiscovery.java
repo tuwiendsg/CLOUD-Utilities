@@ -15,7 +15,7 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.rabbitMq.discovery;
 
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.RabbitMqConsumer;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.discovery.ADiscovery;
 import java.io.IOException;
 import java.util.Properties;
 import org.slf4j.Logger;

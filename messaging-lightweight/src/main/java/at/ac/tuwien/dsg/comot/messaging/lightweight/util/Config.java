@@ -13,29 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.rabbitMq.discovery;
+package at.ac.tuwien.dsg.comot.messaging.lightweight.util;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public abstract class ADiscovery {
-	
-	protected ADiscovery backup;
-	
-	protected abstract String getHost();
-	
-	public String discoverHost() {
-		String host = this.getHost();
-		
-		if(host == null && backup != null) {
-			host = backup.discoverHost();
-		}
-		
-		return host;
+public class Config {	
+	private String salsaIp;
+	private int salsaPort;
+	private String serviceName;
+
+	public String getSalsaIp() {
+		return salsaIp;
 	}
 
-	public void setBackup(ADiscovery backup) {
-		this.backup = backup;
+	public Config setSalsaIp(String salsaIp) {
+		this.salsaIp = salsaIp;
+		return this;
+	}
+
+	public int getSalsaPort() {
+		return salsaPort;
+	}
+
+	public Config setSalsaPort(int salsaPort) {
+		this.salsaPort = salsaPort;
+		return this;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public Config setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+		return this;
 	}
 }
