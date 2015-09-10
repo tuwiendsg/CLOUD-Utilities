@@ -5,6 +5,8 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.lightweight;
 
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.factory.RabbitMqConsumerFactory;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.factory.RabbitMqProducerFactory;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
 
 /**

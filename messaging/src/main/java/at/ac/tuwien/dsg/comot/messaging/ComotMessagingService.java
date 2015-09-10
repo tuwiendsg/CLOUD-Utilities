@@ -18,13 +18,8 @@ package at.ac.tuwien.dsg.comot.messaging;
 import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import at.ac.tuwien.dsg.comot.messaging.api.Producer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqConsumer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqProducer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.SendingChannel;
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.discovery.SalsaDiscovery;
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.orchestrator.RabbitMQServerCluster;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.comot.messaging.rabbitMq.RabbitMQServerCluster;
 import at.ac.tuwien.dsg.comot.messaging.util.Config;
 
 /**
@@ -33,11 +28,13 @@ import at.ac.tuwien.dsg.comot.messaging.util.Config;
  */
 public class ComotMessagingService {
 	
+	private Config config;
 	private RabbitMQServerCluster rabbitCluster;
 	
 	public ComotMessagingService(Config config) {
 		rabbitCluster = new RabbitMQServerCluster(config);
 		rabbitCluster.deploy();
+		this.config = config;
 	}
 	
 	public void setServerCount(int count) {
@@ -49,14 +46,14 @@ public class ComotMessagingService {
 	}
 	
 	public Message getRabbitMqMessage() {
-		return new RabbitMqMessage();
+		return ComotMessagingFactory.getRabbitMqMessage();
 	}
 	
 	public Consumer getRabbitMqConsumer() {
-		return new RabbitMqConsumer(new ReceivingChannel(new SalsaDiscovery(rabbitCluster)));
+		return ComotMessagingFactory.getRabbitMqConsumer().withLightweigthSalsaDiscovery(this.config);
 	}
 	
 	public Producer getRabbitMqProducer() {
-		return new RabbitMqProducer(new SendingChannel(new SalsaDiscovery(rabbitCluster)));
+		return ComotMessagingFactory.getRabbitMqProducer().withLightweightDiscovery(this.config);
 	}	
 }

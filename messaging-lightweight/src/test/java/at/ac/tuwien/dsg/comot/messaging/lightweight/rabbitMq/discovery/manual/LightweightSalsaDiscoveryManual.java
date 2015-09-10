@@ -41,9 +41,9 @@ public class LightweightSalsaDiscoveryManual {
 		System.out.println("getHost");
 		
 		Config config = new Config();
-		config.setSalsaIp("128.130.172.215");
-		config.setSalsaPort(8080);
-		config.setServiceName("ManualTestRabbitService");
+		config.setSalsaIp("128.130.172.215")
+				.setSalsaPort(8080)
+				.setServiceName("ManualTestRabbitService");
 		
 		LightweightSalsaDiscovery instance = new LightweightSalsaDiscovery(config);
 		String expResult = "10.99.0.65";

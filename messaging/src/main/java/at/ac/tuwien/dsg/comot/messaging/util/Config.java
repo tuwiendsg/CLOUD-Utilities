@@ -19,29 +19,8 @@ package at.ac.tuwien.dsg.comot.messaging.util;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class Config {	
-	private String salsaIp;
-	private int salsaPort;
+public class Config extends at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config<Config> {	
 	private int serverCount;
-	private String serviceName;
-
-	public String getSalsaIp() {
-		return salsaIp;
-	}
-
-	public Config setSalsaIp(String salsaIp) {
-		this.salsaIp = salsaIp;
-		return this;
-	}
-
-	public int getSalsaPort() {
-		return salsaPort;
-	}
-
-	public Config setSalsaPort(int salsaPort) {
-		this.salsaPort = salsaPort;
-		return this;
-	}
 
 	public int getServerCount() {
 		return serverCount;
@@ -50,14 +29,5 @@ public class Config {
 	public Config setServerCount(int rabbitServerCount) {
 		this.serverCount = rabbitServerCount;
 		return this;
-	}
-
-	public String getServiceName() {
-		return serviceName;
-	}
-
-	public Config setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-		return this;
-	}
+	}	
 }

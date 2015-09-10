@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.messaging.lightweight;
+package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.factory;
 
 import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqConsumer;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
@@ -16,7 +16,7 @@ import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
  */
 public class RabbitMqConsumerFactory {
 	
-	public RabbitMqConsumer withLightweigthDiscovery(Config config) {
+	public RabbitMqConsumer withLightweigthSalsaDiscovery(Config config) {
 		return new RabbitMqConsumer(new ReceivingChannel(new LightweightSalsaDiscovery(config)));
 	}
 }

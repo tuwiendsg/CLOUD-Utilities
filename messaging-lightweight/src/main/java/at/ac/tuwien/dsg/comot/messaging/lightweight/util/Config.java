@@ -19,7 +19,7 @@ package at.ac.tuwien.dsg.comot.messaging.lightweight.util;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class Config {	
+public class Config<T extends Config> {	
 	private String salsaIp;
 	private int salsaPort;
 	private String serviceName;
@@ -28,26 +28,26 @@ public class Config {
 		return salsaIp;
 	}
 
-	public Config setSalsaIp(String salsaIp) {
+	public T setSalsaIp(String salsaIp) {
 		this.salsaIp = salsaIp;
-		return this;
+		return (T)this;
 	}
 
 	public int getSalsaPort() {
 		return salsaPort;
 	}
 
-	public Config setSalsaPort(int salsaPort) {
+	public T setSalsaPort(int salsaPort) {
 		this.salsaPort = salsaPort;
-		return this;
+		return (T)this;
 	}
 
 	public String getServiceName() {
 		return serviceName;
 	}
 
-	public Config setServiceName(String serviceName) {
+	public T setServiceName(String serviceName) {
 		this.serviceName = serviceName;
-		return this;
+		return (T)this;
 	}
 }

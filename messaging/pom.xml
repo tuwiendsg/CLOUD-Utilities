@@ -6,7 +6,7 @@
 		<artifactId>comot-utilities</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>comot-messaging</artifactId>
+	<artifactId>messaging</artifactId>
 	<packaging>jar</packaging>
 	<name>COMOT Messaging</name>
 	<dependencies>
