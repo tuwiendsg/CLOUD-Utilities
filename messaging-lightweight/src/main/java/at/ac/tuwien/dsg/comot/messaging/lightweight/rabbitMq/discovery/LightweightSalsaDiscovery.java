@@ -20,7 +20,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
  *
@@ -41,7 +41,7 @@ public class LightweightSalsaDiscovery extends ADiscovery {
 			URI statusUri = UriBuilder.fromPath(restCommand).build(this.config.getServiceName());
 			HttpGet method = new HttpGet(statusUri);
 			HttpHost host = new HttpHost(this.config.getSalsaIp(), this.config.getSalsaPort());
-			HttpClient client = HttpClientBuilder.create().build();
+			HttpClient client = new DefaultHttpClient();
 			HttpResponse response = client.execute(host, method);
 			
 			if (response.getStatusLine().getStatusCode() == 200) {
