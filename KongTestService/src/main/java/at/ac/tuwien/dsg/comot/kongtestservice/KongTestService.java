@@ -10,13 +10,8 @@ import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
 import java.net.SocketException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -25,30 +20,48 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @RestController
 public class KongTestService {
-	
+
 	public KongTestService() {
 		try {
+			KongRegistrationService.deleteApi("ktsRoot");
+			
+			String ip = NetworkService.getIp();
+			
 			APIObject rootApi = new APIObject();
 			rootApi.setName("ktsRoot");
 			rootApi.setPath("kts");
+			rootApi.setPublicDns(ip);
 			//todo: i have to query the ip otherwise it wont work... or maybe a property file
-			rootApi.setTargetUrl(String.format("http://%s:8080", NetworkService.getIp()));
+			rootApi.setTargetUrl(String.format("http://%s:8080", ip));
 			
-			HttpEntity requestEntity = new HttpEntity(rootApi);
-			
-			RestTemplate restTemplate = new RestTemplate();
-			ResponseEntity<String> resp = restTemplate.exchange("http://128.130.172.214:8001/apis", HttpMethod.POST, requestEntity, String.class);
+			KongRegistrationService.registerApi(rootApi);
 		} catch (SocketException ex) {
 		}
 	}
 
 	@RequestMapping("/")
-	public String greeting(){
+	public String greeting() {
 		return "Welcome to the Kong Test Service!";
 	}
-	
+
+	/*@RequestMapping("/test")
+	 public APIObject test(){
+	 try {
+	 APIObject rootApi = new APIObject();
+	 rootApi.setName("ktsRoot");
+	 rootApi.setPath("kts");
+	 //todo: i have to query the ip otherwise it wont work... or maybe a property file
+	 rootApi.setTargetUrl(String.format("http://%s:8080", NetworkService.getIp()));
+			
+	 return rootApi;
+	 } catch (SocketException ex) {
+	 Logger.getLogger(KongTestService.class.getName()).log(Level.SEVERE, null, ex);
+	 }
+		
+	 return null;
+	 }*/
 	public static void main(String[] args) throws Exception {
-        SpringApplication.run(KongTestService.class, args);
-    }
-	
+		SpringApplication.run(KongTestService.class, args);
+	}
+
 }

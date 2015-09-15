@@ -11,13 +11,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class APIObject {
-	public String name;
-	public String publicDns;
-	public String path;
-	public boolean stripPath;
-	public boolean preserveHost;
-	public String targetUrl;
+public class APIResponseObject {
+	private String id;
+	private String name;
+	private String publicDns;
+	private String targetUrl;
+	private boolean preserveHost;
+	private long createdAt;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -36,32 +44,6 @@ public class APIObject {
 		this.publicDns = publicDns;
 	}
 
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	@JsonProperty("strip_path")
-	public boolean isStripPath() {
-		return stripPath;
-	}
-
-	public void setStripPath(boolean stripPath) {
-		this.stripPath = stripPath;
-	}
-
-	@JsonProperty("preserve_host")
-	public boolean isPreserveHost() {
-		return preserveHost;
-	}
-
-	public void setPreserveHost(boolean preserveHost) {
-		this.preserveHost = preserveHost;
-	}
-
 	@JsonProperty("target_url")
 	public String getTargetUrl() {
 		return targetUrl;
@@ -70,4 +52,23 @@ public class APIObject {
 	public void setTargetUrl(String targetUrl) {
 		this.targetUrl = targetUrl;
 	}
+
+	@JsonProperty("preserve_host")
+	public boolean isPreserveHost() {
+		return preserveHost;
+	}
+
+	public void setPreserveHost(boolean preserverHost) {
+		this.preserveHost = preserveHost;
+	}
+
+	@JsonProperty("created_at")
+	public long getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
+	}
+	
 }
