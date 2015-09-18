@@ -13,6 +13,7 @@ import java.net.URI;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -22,8 +23,11 @@ import org.springframework.web.client.RestTemplate;
 public class KongRegistrationService {
 
 	public static void deleteApi(String name) {
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.delete("http://128.130.172.214:8001/apis/" + name);
+		try {
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.delete("http://128.130.172.214:8001/apis/" + name);
+		} catch (HttpClientErrorException ex) {
+		}
 	}
 
 	public static void registerApi(APIObject apiObject) {

@@ -31,7 +31,7 @@ public class KongTestService {
 			rootApi.setName("ktsRoot");
 			rootApi.setPath("kts");
 			rootApi.setPublicDns(ip);
-			//todo: i have to query the ip otherwise it wont work... or maybe a property file
+			rootApi.setStripPath(true);
 			rootApi.setTargetUrl(String.format("http://%s:8080", ip));
 			
 			KongRegistrationService.registerApi(rootApi);
