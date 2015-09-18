@@ -14,5 +14,7 @@
 		<module>messaging-api</module>
 		<module>messaging</module>
 		<module>messaging-lightweight</module>
+		<module>gateway-registry</module>
+	 <module>gateway-adapter</module>
 	</modules>
 </project>
