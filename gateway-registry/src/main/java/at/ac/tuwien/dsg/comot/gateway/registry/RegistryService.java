@@ -5,47 +5,54 @@
  */
 package at.ac.tuwien.dsg.comot.gateway.registry;
 
-import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
-import at.ac.tuwien.dsg.comot.messaging.api.Message;
-import at.ac.tuwien.dsg.comot.messaging.api.MessageReceivedListener;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
+import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.comot.gateway.registry.tasks.Task;
+import java.net.URI;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 @SpringBootApplication
-public class RegistryService implements MessageReceivedListener {
+public class RegistryService {
 
-	private Consumer consumer;
+	private ExecutorService executorService;
 
 	public RegistryService() {
+		this.executorService = Executors.newCachedThreadPool();
+	}
 
+	public void execute(Task task) {
+		this.executorService.execute(task);
+	}
+
+	public void deleteApi(String name) {
 		try {
-			Properties properties = new Properties();
-			InputStream propStream = getClass().getClassLoader().getResourceAsStream("messagingConfig.properties");
-			properties.load(propStream);
-			propStream.close();
-
-			Config config = new Config();
-			config.setSalsaIp(properties.getProperty("salsa.ip", "128.130.172.215"))
-					.setSalsaPort(Integer.valueOf(properties.getProperty("salsa.port", "8080")))
-					.setServiceName(properties.getProperty("salsa.service", "ManualTestRabbitService"));
-					
-			this.consumer = ComotMessagingFactory
-					.getRabbitMqConsumer()
-					.withLightweigthSalsaDiscovery(config)
-					.withType("apiRegistry");
-			
-			this.consumer.addMessageReceivedListener(this);
-		} catch (IOException ex) {
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.delete("http://128.130.172.214:8001/apis/" + name);
+		} catch (HttpClientErrorException ex) {
 		}
+	}
+
+	public void registerApi(APIObject apiObject) {
+		RequestEntity<APIObject> requestEntity = RequestEntity
+				.put(URI.create("http://128.130.172.214:8001/apis/"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.ALL)
+				.body(apiObject);
+
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<APIResponseObject> resp = restTemplate.exchange(requestEntity, APIResponseObject.class);
 	}
 
 	/**
@@ -54,10 +61,4 @@ public class RegistryService implements MessageReceivedListener {
 	public static void main(String[] args) {
 		SpringApplication.run(RegistryService.class, args);
 	}
-
-	@Override
-	public void messageReceived(Message message) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
 }

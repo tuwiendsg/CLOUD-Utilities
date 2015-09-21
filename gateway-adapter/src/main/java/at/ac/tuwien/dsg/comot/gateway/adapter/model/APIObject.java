@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.adapter;
+package at.ac.tuwien.dsg.comot.gateway.adapter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

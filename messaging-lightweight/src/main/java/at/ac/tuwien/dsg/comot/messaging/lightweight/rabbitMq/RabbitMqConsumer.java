@@ -51,17 +51,20 @@ public class RabbitMqConsumer implements Consumer, Runnable {
 	}
 
 	@Override
-	public synchronized void addMessageReceivedListener(MessageReceivedListener listener) {
+	public synchronized RabbitMqConsumer addMessageReceivedListener(MessageReceivedListener listener) {
 		this.messageListeners.add(listener);
 
 		if (this.messageListeners.size() == 1) {
 			this.threadPool.execute(this);
 		}
+		
+		return this;
 	}
 
 	@Override
-	public synchronized void removeMessageReceivedListener(MessageReceivedListener listener) {
+	public synchronized RabbitMqConsumer removeMessageReceivedListener(MessageReceivedListener listener) {
 		this.messageListeners.remove(listener);
+		return this;
 	}
 
 	private synchronized void fireMessageReceived(Message msg) {

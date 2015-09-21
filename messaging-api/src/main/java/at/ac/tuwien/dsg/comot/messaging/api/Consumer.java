@@ -31,12 +31,12 @@ public interface Consumer {
 	 * Add a listener to this consumer which will get notified when a message arrives.
 	 * @param listener - The listener to add.
 	 */
-	void addMessageReceivedListener(MessageReceivedListener listener);
+	Consumer addMessageReceivedListener(MessageReceivedListener listener);
 	/**
 	 * Remove a listener from this consumer.
 	 * @param listener - The listener to remove.
 	 */
-	void removeMessageReceivedListener(MessageReceivedListener listener);
+	Consumer removeMessageReceivedListener(MessageReceivedListener listener);
 	/**
 	 * This sets the types of messages this consumer shall receive.
 	 * 

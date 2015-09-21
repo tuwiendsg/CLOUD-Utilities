@@ -28,6 +28,18 @@
 	  <version>0.0.1-SNAPSHOT</version>
 	  <type>jar</type>
 	 </dependency>
+	 <dependency>
+	  <groupId>at.ac.tuwien.dsg.comot</groupId>
+	  <artifactId>gateway-adapter</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+	  <type>jar</type>
+	 </dependency>
+	 <dependency>
+	  <groupId>org.springframework</groupId>
+	  <artifactId>spring-web</artifactId>
+	  <version>4.2.1.RELEASE</version>
+	  <type>jar</type>
+	 </dependency>
 	</dependencies>
 	
     <dependencyManagement>
