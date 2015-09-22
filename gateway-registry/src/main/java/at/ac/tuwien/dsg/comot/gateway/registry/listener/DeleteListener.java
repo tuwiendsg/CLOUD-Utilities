@@ -5,24 +5,23 @@
  */
 package at.ac.tuwien.dsg.comot.gateway.registry.listener;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
+import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.comot.gateway.registry.ConfigService;
 import at.ac.tuwien.dsg.comot.gateway.registry.RegistryService;
-import at.ac.tuwien.dsg.comot.gateway.registry.tasks.RegisterApiTask;
+import at.ac.tuwien.dsg.comot.gateway.registry.tasks.DeleteApiTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 @Component
-public class RegisterListener extends AListener<APIObject, RegisterApiTask> {
-	
+public class DeleteListener extends AListener<APIResponseObject, DeleteApiTask>{
+
 	@Autowired
-	public RegisterListener(RegistryService service, ConfigService config) {
-		super(service, config, "registerApiChannel", RegisterApiTask.class);
+	public DeleteListener(RegistryService service, ConfigService config) {
+		super(service, config, "deleteApi", DeleteApiTask.class);
 	}
+	
 }

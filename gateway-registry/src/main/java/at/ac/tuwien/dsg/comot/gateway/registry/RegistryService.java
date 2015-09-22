@@ -7,6 +7,7 @@ package at.ac.tuwien.dsg.comot.gateway.registry;
 
 import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
 import at.ac.tuwien.dsg.comot.gateway.registry.tasks.Task;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
@@ -36,15 +37,15 @@ public class RegistryService {
 		this.executorService.execute(task);
 	}
 
-	public void deleteApi(String name) {
+	public void deleteApi(String id) {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.delete("http://128.130.172.214:8001/apis/" + name);
+			restTemplate.delete("http://128.130.172.214:8001/apis/" + id);
 		} catch (HttpClientErrorException ex) {
 		}
 	}
 
-	public void registerApi(APIObject apiObject) {
+	public APIResponseObject registerApi(APIObject apiObject) {
 		RequestEntity<APIObject> requestEntity = RequestEntity
 				.put(URI.create("http://128.130.172.214:8001/apis/"))
 				.contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +53,10 @@ public class RegistryService {
 				.body(apiObject);
 
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<APIResponseObject> resp = restTemplate.exchange(requestEntity, APIResponseObject.class);
+		ResponseEntity<APIResponseObject> resp = restTemplate
+				.exchange(requestEntity, APIResponseObject.class);
+		
+		return resp.getBody();
 	}
 
 	/**

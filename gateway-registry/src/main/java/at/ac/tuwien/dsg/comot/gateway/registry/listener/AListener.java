@@ -5,6 +5,7 @@
  */
 package at.ac.tuwien.dsg.comot.gateway.registry.listener;
 
+import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
 import at.ac.tuwien.dsg.comot.gateway.registry.ConfigService;
 import at.ac.tuwien.dsg.comot.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.comot.gateway.registry.tasks.Task;
@@ -22,15 +23,14 @@ import java.util.logging.Logger;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public abstract class AListener<O, T extends Task<O>> implements MessageReceivedListener {
+public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements MessageReceivedListener {
 	
 	protected RegistryService registryService;
 	private Consumer consumer;
-	private Class<O> clazz;
 	private Class<T> taskClazz;
 	
-	protected AListener(RegistryService service, ConfigService config, String channelName,
-			Class<O> clazz, Class<T> taskClazz) {
+	protected AListener(RegistryService service, ConfigService config, 
+			String channelName, Class<T> taskClazz) {
 		this.consumer = ComotMessagingFactory
 				.getRabbitMqConsumer()
 				.withLightweigthSalsaDiscovery(config.getConfig())
@@ -38,13 +38,14 @@ public abstract class AListener<O, T extends Task<O>> implements MessageReceived
 				.withType(channelName);
 		
 		this.registryService = service;
+		this.taskClazz = taskClazz;
 	}
 	
 	@Override
 	public void messageReceived(Message message) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			O object = mapper.readValue(message.getMessage(), clazz);
+			ChannelWrapper object = mapper.readValue(message.getMessage(), ChannelWrapper.class);
 			
 			T task = taskClazz.getConstructor(RegistryService.class)
 					.newInstance(this.registryService);
