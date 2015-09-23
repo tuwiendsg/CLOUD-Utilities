@@ -5,15 +5,16 @@
  */
 package at.ac.tuwien.dsg.comot.gateway.adapter;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
-
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public interface AdapterService {
-	Adapter createApiAdapter();
-	void unregisterAllApis();
-	void send(APIObject object);
-	void delete(String targetUrl);
+public interface Adapter {	
+	Adapter withName(String name);
+	Adapter withPublicDns(String dns);
+	Adapter withPath(String path);
+	Adapter doStripPath(boolean stripPath);
+	Adapter doPreserveHost(boolean preserveHost);
+	Adapter withTargetUrl(String targetUrl);
+	void send();
 }
