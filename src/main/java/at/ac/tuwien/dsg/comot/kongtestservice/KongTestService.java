@@ -5,9 +5,11 @@
  */
 package at.ac.tuwien.dsg.comot.kongtestservice;
 
-import at.ac.tuwien.dsg.comot.kongtestservice.model.APIObject;
+import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterService;
+import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
 import java.net.SocketException;
+import javax.annotation.PreDestroy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,22 +23,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class KongTestService {
 
+	private AdapterService adapterService;
+	
 	public KongTestService() {
 		try {
-			KongRegistrationService.deleteApi("ktsRoot");
-			
 			String ip = NetworkService.getIp();
 			
-			APIObject rootApi = new APIObject();
-			rootApi.setName("ktsRoot");
-			rootApi.setPath("kts");
-			rootApi.setPublicDns(ip);
-			rootApi.setStripPath(true);
-			rootApi.setTargetUrl(String.format("http://%s:8080", ip));
-			
-			KongRegistrationService.registerApi(rootApi);
+			//todo: add a additional part:
+				//.newApiRegistration
+				//this will probably also fix the getOrCreate issue in send
+				//when there is no previous object created (null values)
+			this.adapterService.createApiAdapter()
+					.withName("ktsRoot")
+					.withPath("kts")
+					.doStripPath(true)
+					.withPublicDns(ip)
+					.withTargetUrl(String.format("http://%s:8080", ip))
+					.send();
 		} catch (SocketException ex) {
 		}
+	}
+	
+	@PreDestroy
+	public void shutdown(){
+		//todo: blocking mode is needed in here
+		this.adapterService.unregisterAllApis();
 	}
 
 	@RequestMapping("/")
@@ -44,22 +55,6 @@ public class KongTestService {
 		return "Welcome to the Kong Test Service!";
 	}
 
-	/*@RequestMapping("/test")
-	 public APIObject test(){
-	 try {
-	 APIObject rootApi = new APIObject();
-	 rootApi.setName("ktsRoot");
-	 rootApi.setPath("kts");
-	 //todo: i have to query the ip otherwise it wont work... or maybe a property file
-	 rootApi.setTargetUrl(String.format("http://%s:8080", NetworkService.getIp()));
-			
-	 return rootApi;
-	 } catch (SocketException ex) {
-	 Logger.getLogger(KongTestService.class.getName()).log(Level.SEVERE, null, ex);
-	 }
-		
-	 return null;
-	 }*/
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(KongTestService.class, args);
 	}
