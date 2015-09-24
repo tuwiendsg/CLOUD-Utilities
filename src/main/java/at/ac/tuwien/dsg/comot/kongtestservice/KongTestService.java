@@ -6,8 +6,10 @@
 package at.ac.tuwien.dsg.comot.kongtestservice;
 
 import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterService;
+import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterServiceImpl;
 import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
 import java.net.SocketException;
 import javax.annotation.PreDestroy;
 import org.springframework.boot.SpringApplication;
@@ -26,6 +28,14 @@ public class KongTestService {
 	private AdapterService adapterService;
 	
 	public KongTestService() {
+		
+		Config config = new Config();
+		config.setSalsaIp("128.130.172.215")
+				.setSalsaPort(8080)
+				.setServiceName("ManualTestRabbitService");
+		
+		this.adapterService = new AdapterServiceImpl(config);
+		
 		try {
 			String ip = NetworkService.getIp();
 			
