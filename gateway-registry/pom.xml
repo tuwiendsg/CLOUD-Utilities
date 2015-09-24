@@ -18,7 +18,7 @@
         </dependency>
 	 <dependency>
 	  <groupId>at.ac.tuwien.dsg.comot</groupId>
-	  <artifactId>comot-messaging-api</artifactId>
+	  <artifactId>messaging-api</artifactId>
 	  <version>0.0.1-SNAPSHOT</version>
 	  <type>jar</type>
 	 </dependency>
