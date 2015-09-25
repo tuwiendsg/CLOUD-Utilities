@@ -15,14 +15,14 @@ import at.ac.tuwien.dsg.comot.messaging.api.Producer;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
+	private static org.slf4j.Logger logger = LoggerFactory.getLogger(RegisterApiTask.class);
 	
 	private ConfigService confService;
 	private Producer producer;
@@ -47,7 +47,7 @@ public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
 			
 			this.producer.sendMessage(response);
 		} catch (IOException ex) {
-			Logger.getLogger(RegisterApiTask.class.getName()).log(Level.SEVERE, null, ex);
+			logger.error("Unexpected error!", ex);
 		}
 	}
 

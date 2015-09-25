@@ -9,8 +9,7 @@ import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,6 +18,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ConfigService {
+	
+	private static org.slf4j.Logger logger = LoggerFactory.getLogger(ConfigService.class);
 
 	public Config getConfig() {
 
@@ -38,7 +39,7 @@ public class ConfigService {
 							.getProperty("salsa.service", "ManualTestRabbitService"));
 			return config;
 		} catch (IOException ex) {
-			Logger.getLogger(ConfigService.class.getName()).log(Level.SEVERE, null, ex);
+			logger.error("Could not retrieve config!", ex);
 		}
 
 		return null;

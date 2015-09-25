@@ -16,14 +16,14 @@ import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements MessageReceivedListener {
+	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AListener.class);
 	
 	protected RegistryService registryService;
 	private Consumer consumer;
@@ -51,12 +51,14 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 					.newInstance(this.registryService);
 			task.setBody(object);
 			this.registryService.execute(task);
-		} catch (IOException ex) {
-			Logger.getLogger(RegisterListener.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (NoSuchMethodException | SecurityException 
-				| InstantiationException | IllegalAccessException 
-				| IllegalArgumentException | InvocationTargetException ex) {
-			Logger.getLogger(AListener.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (IOException 
+				| NoSuchMethodException 
+				| SecurityException 
+				| InstantiationException 
+				| IllegalAccessException 
+				| IllegalArgumentException 
+				| InvocationTargetException ex) {
+			logger.error("Unexpected error!", ex);
 		}
 	}
 }

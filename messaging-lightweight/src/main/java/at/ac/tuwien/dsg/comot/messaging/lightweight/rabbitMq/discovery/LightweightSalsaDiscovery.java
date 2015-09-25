@@ -21,12 +21,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class LightweightSalsaDiscovery extends ADiscovery {
+
+	private static Logger logger = LoggerFactory.getLogger(LightweightSalsaDiscovery.class);
 
 	private Config config;
 	private final String restCommand = "/salsa-engine/rest/services/tosca/{serviceId}/sybl";
@@ -43,33 +47,29 @@ public class LightweightSalsaDiscovery extends ADiscovery {
 			HttpHost host = new HttpHost(this.config.getSalsaIp(), this.config.getSalsaPort());
 			HttpClient client = new DefaultHttpClient();
 			HttpResponse response = client.execute(host, method);
-			
+
 			if (response.getStatusLine().getStatusCode() == 200) {
-				try {
-					ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-					response.getEntity().writeTo(outputStream);
-					String serviceDescription = new String(outputStream.toByteArray());
-					
-					JAXBContext a = JAXBContext.newInstance(DeploymentDescription.class);
-					Unmarshaller u = a.createUnmarshaller();
-					if (!serviceDescription.equalsIgnoreCase("")) {
-						Object object = u.unmarshal(new StringReader(serviceDescription));
-						DeploymentDescription deploymentInfo = (DeploymentDescription) object;
-						
-						for(DeploymentUnit unit: deploymentInfo.getDeployments()) {
-							if(unit.getServiceUnitID().contains("RabbitServer")) {
-								return unit.getAssociatedVM().get(0).getIp();
-							}
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+				response.getEntity().writeTo(outputStream);
+				String serviceDescription = new String(outputStream.toByteArray());
+
+				JAXBContext a = JAXBContext.newInstance(DeploymentDescription.class);
+				Unmarshaller u = a.createUnmarshaller();
+				if (!serviceDescription.equalsIgnoreCase("")) {
+					Object object = u.unmarshal(new StringReader(serviceDescription));
+					DeploymentDescription deploymentInfo = (DeploymentDescription) object;
+
+					for (DeploymentUnit unit : deploymentInfo.getDeployments()) {
+						if (unit.getServiceUnitID().contains("RabbitServer")) {
+							return unit.getAssociatedVM().get(0).getIp();
 						}
 					}
-				} catch (JAXBException e) {
-					//todo: log
 				}
 			}
-		} catch (IOException ex) {
-			//todo: log
+		} catch (IOException | JAXBException ex) {
+			logger.error("Unexpected exception while retrieving host!", ex);
 		}
-		
+
 		return null;
 	}
 

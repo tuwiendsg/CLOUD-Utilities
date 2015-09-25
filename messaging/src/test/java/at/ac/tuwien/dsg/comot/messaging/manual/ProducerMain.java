@@ -19,12 +19,9 @@ import at.ac.tuwien.dsg.comot.messaging.ComotMessagingService;
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import at.ac.tuwien.dsg.comot.messaging.api.Producer;
 import at.ac.tuwien.dsg.comot.messaging.util.Config;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

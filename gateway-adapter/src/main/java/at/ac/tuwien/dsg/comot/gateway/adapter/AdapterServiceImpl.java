@@ -16,18 +16,16 @@ import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class AdapterServiceImpl implements AdapterService, MessageReceivedListener {
-
+	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AdapterServiceImpl.class);
+	
 	private Producer producer;
 	private Consumer consumer;
 	private Config config;
@@ -35,7 +33,6 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	private String generatedChannelName;
 	private ObjectMapper mapper;
 
-	//todo: make here a map between api name and responseObject
 	private final ConcurrentHashMap<String, APIResponseObject> registeredAPIs;
 
 	public AdapterServiceImpl(Config config) {
@@ -98,7 +95,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 			this.producer.sendMessage(msg);
 		} catch (IOException ex) {
-			Logger.getLogger(AdapterServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+			logger.error("Failed to map message!", ex);
 		}
 	}
 
@@ -108,7 +105,6 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 		});
 	}
 
-	//todo: hide messageReceived behind an AdapterInterface
 	@Override
 	public void messageReceived(Message message) {
 		try {
@@ -117,7 +113,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 					APIResponseObject.class);
 			this.registeredAPIs.put(res.getTargetUrl(), res);
 		} catch (IOException ex) {
-			Logger.getLogger(AdapterServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+			logger.error("Failed to read message.", ex);
 		}
 	}
 }
