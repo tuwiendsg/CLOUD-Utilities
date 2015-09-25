@@ -7,11 +7,12 @@ package at.ac.tuwien.dsg.comot.kongtestservice;
 
 import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterService;
 import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterServiceImpl;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
 import java.net.SocketException;
 import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 public class KongTestService {
+	
+	private static Logger logger = LoggerFactory.getLogger(KongTestService.class);
 
 	private AdapterService adapterService;
 	
@@ -51,12 +54,14 @@ public class KongTestService {
 					.withTargetUrl(String.format("http://%s:8080", ip))
 					.send();
 		} catch (SocketException ex) {
+			logger.error("Error with extracting IP.", ex);
 		}
 	}
 	
 	@PreDestroy
 	public void shutdown(){
 		//todo: blocking mode is needed in here
+			//or is it?
 		this.adapterService.unregisterAllApis();
 	}
 
