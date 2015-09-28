@@ -9,40 +9,49 @@
 	<artifactId>gateway-registry</artifactId>
 	<packaging>jar</packaging>
 	<name>COMOT Gateway Registry</name>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+			</plugin>
+		</plugins>
+	</build>
     
 	<dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <type>jar</type>
-        </dependency>
-	 <dependency>
-	  <groupId>at.ac.tuwien.dsg.comot</groupId>
-	  <artifactId>messaging-api</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>
-	  <type>jar</type>
-	 </dependency>
-	 <dependency>
-	  <groupId>at.ac.tuwien.dsg.comot</groupId>
-	  <artifactId>messaging-lightweight</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>
-	  <type>jar</type>
-	 </dependency>
-	 <dependency>
-	  <groupId>at.ac.tuwien.dsg.comot</groupId>
-	  <artifactId>gateway-adapter</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>
-	  <type>jar</type>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.springframework</groupId>
-	  <artifactId>spring-web</artifactId>
-	  <version>4.2.1.RELEASE</version>
-	  <type>jar</type>
-	 </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.dsg.comot</groupId>
+			<artifactId>messaging-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.dsg.comot</groupId>
+			<artifactId>messaging-lightweight</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.dsg.comot</groupId>
+			<artifactId>gateway-adapter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>4.2.1.RELEASE</version>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 	
-    <dependencyManagement>
+	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<!-- Import dependency management from Spring Boot -->
