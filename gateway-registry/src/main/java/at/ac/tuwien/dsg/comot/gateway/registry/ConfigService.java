@@ -24,6 +24,7 @@ public class ConfigService {
 	public Config getConfig() {
 
 		try {
+			//todo: should not crash when no config file available
 			Properties properties = new Properties();
 			InputStream propStream = getClass().getClassLoader()
 					.getResourceAsStream("messagingConfig.properties");
