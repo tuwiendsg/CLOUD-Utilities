@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging;
+package at.ac.tuwien.dsg.comot.messaging.lightweight;
 
 import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import at.ac.tuwien.dsg.comot.messaging.api.Producer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.RabbitMQServerCluster;
-import at.ac.tuwien.dsg.comot.messaging.util.Config;
+import at.ac.tuwien.dsg.comot.messaging.api.ServerCluster;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
 
 /**
  *
@@ -29,20 +28,20 @@ import at.ac.tuwien.dsg.comot.messaging.util.Config;
 public class ComotMessagingService {
 	
 	private Config config;
-	private RabbitMQServerCluster rabbitCluster;
+	private ServerCluster cluster;
 	
 	public ComotMessagingService(Config config) {
-		rabbitCluster = new RabbitMQServerCluster(config);
-		rabbitCluster.deploy();
 		this.config = config;
 	}
 	
-	public void setServerCount(int count) {
-		rabbitCluster.changeServerCount(count);
+	public ComotMessagingService(Config config, ServerCluster cluster) {
+		this.cluster = cluster;
+		this.cluster.deploy();
+		this.config = config;
 	}
 	
-	public int getServerCount() {
-		return rabbitCluster.getServerList().size();
+	public ServerCluster getServerCluster() {
+		return this.cluster;
 	}
 	
 	public Message getRabbitMqMessage() {
