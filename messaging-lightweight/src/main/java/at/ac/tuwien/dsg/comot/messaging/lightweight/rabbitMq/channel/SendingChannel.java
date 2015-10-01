@@ -15,8 +15,8 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel;
 
+import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.discovery.ADiscovery;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -31,7 +31,7 @@ public class SendingChannel extends ARabbitChannel {
 	
 	private static Logger logger = LoggerFactory.getLogger(SendingChannel.class);
 	
-	public SendingChannel(ADiscovery discovery) {
+	public SendingChannel(Discovery discovery) {
 		super(discovery);
 	}
 

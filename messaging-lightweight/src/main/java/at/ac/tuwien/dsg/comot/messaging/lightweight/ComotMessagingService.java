@@ -16,6 +16,7 @@
 package at.ac.tuwien.dsg.comot.messaging.lightweight;
 
 import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
+import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
 import at.ac.tuwien.dsg.comot.messaging.api.Message;
 import at.ac.tuwien.dsg.comot.messaging.api.Producer;
 import at.ac.tuwien.dsg.comot.messaging.api.ServerCluster;
@@ -27,17 +28,17 @@ import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
  */
 public class ComotMessagingService {
 	
-	private Config config;
+	private Discovery discovery;
 	private ServerCluster cluster;
 	
-	public ComotMessagingService(Config config) {
-		this.config = config;
+	public ComotMessagingService(Discovery discovery) {
+		this.discovery = discovery;
 	}
 	
-	public ComotMessagingService(Config config, ServerCluster cluster) {
+	public ComotMessagingService(Discovery discovery, ServerCluster cluster) {
 		this.cluster = cluster;
 		this.cluster.deploy();
-		this.config = config;
+		this.discovery = discovery;
 	}
 	
 	public ServerCluster getServerCluster() {
@@ -49,10 +50,10 @@ public class ComotMessagingService {
 	}
 	
 	public Consumer getRabbitMqConsumer() {
-		return ComotMessagingFactory.getRabbitMqConsumer().withLightweigthSalsaDiscovery(this.config);
+		return ComotMessagingFactory.getRabbitMqConsumer(discovery);
 	}
 	
 	public Producer getRabbitMqProducer() {
-		return ComotMessagingFactory.getRabbitMqProducer().withLightweightDiscovery(this.config);
+		return ComotMessagingFactory.getRabbitMqProducer(discovery);
 	}	
 }

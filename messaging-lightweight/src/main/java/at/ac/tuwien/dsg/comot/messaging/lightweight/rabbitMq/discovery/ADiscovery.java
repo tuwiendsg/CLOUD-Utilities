@@ -15,27 +15,26 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.discovery;
 
+import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
+
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public abstract class ADiscovery {
+public abstract class ADiscovery implements Discovery {
 	
-	protected ADiscovery backup;
+	protected Discovery backup;
 	
-	protected abstract String getHost();
-	
-	public String discoverHost() {
-		String host = this.getHost();
-		
+	public String discoverHost(String host) {		
 		if(host == null && backup != null) {
-			host = backup.discoverHost();
+			return backup.discoverHost();
 		}
 		
 		return host;
 	}
 
-	public void setBackup(ADiscovery backup) {
+	@Override
+	public void setBackup(Discovery backup) {
 		this.backup = backup;
 	}
 }

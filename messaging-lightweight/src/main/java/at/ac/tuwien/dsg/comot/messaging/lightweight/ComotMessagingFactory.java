@@ -5,21 +5,24 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.lightweight;
 
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.factory.RabbitMqConsumerFactory;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.factory.RabbitMqProducerFactory;
+import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqConsumer;
 import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqProducer;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
+import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.SendingChannel;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class ComotMessagingFactory {
-	public static RabbitMqConsumerFactory getRabbitMqConsumer() {
-		return new RabbitMqConsumerFactory();
+	public static RabbitMqConsumer getRabbitMqConsumer(Discovery discovery) {
+		return new RabbitMqConsumer(new ReceivingChannel(discovery));
 	}
 	
-	public static RabbitMqProducerFactory getRabbitMqProducer() {
-		return new RabbitMqProducerFactory();
+	public static RabbitMqProducer getRabbitMqProducer(Discovery discovery) {
+		return new RabbitMqProducer(new SendingChannel(discovery));
 	}
 	
 	public static RabbitMqMessage getRabbitMqMessage() {

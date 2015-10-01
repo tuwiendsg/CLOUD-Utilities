@@ -15,7 +15,7 @@
  */
 package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel;
 
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.discovery.ADiscovery;
+import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -32,7 +32,7 @@ public abstract class ARabbitChannel {
 	protected Connection connection;
 	protected Channel channel;
 	
-	protected ARabbitChannel(ADiscovery discovery) {
+	protected ARabbitChannel(Discovery discovery) {
 		try {			
 			factory = new ConnectionFactory();
 			factory.setHost(discovery.discoverHost());
