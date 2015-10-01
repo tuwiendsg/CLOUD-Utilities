@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq;
 
 import java.io.Serializable;
 import java.util.ArrayList;

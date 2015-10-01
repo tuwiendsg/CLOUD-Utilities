@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015 Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,18 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.api;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.discovery;
 
-import java.util.EventListener;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+
 
 /**
- * 
+ *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public interface MessageReceivedListener extends EventListener {
-	/**
-	 * Gets fired when a message has been received by the consumer.
-	 * @param message - The received message.
-	 */
-	void messageReceived(Message message);
+public abstract class ADiscovery implements Discovery {
+	
+	protected Discovery backup;
+	
+	public String discoverHost(String host) {		
+		if(host == null && backup != null) {
+			return backup.discoverHost();
+		}
+		
+		return host;
+	}
+
+	@Override
+	public void setBackup(Discovery backup) {
+		this.backup = backup;
+	}
 }

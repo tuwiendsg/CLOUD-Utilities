@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.messaging.lightweight.util;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util;
 
 /**
  *

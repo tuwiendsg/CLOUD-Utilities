@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel;
 
-import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.messaging.lightweight;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight;
 
-import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqConsumer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqMessage;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.RabbitMqProducer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.rabbitMq.channel.SendingChannel;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqConsumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqProducer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.SendingChannel;
+
+
 
 /**
  *

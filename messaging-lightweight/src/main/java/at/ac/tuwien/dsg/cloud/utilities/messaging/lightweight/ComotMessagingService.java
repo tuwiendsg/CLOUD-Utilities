@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.comot.messaging.lightweight;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight;
 
-import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
-import at.ac.tuwien.dsg.comot.messaging.api.Discovery;
-import at.ac.tuwien.dsg.comot.messaging.api.Message;
-import at.ac.tuwien.dsg.comot.messaging.api.Producer;
-import at.ac.tuwien.dsg.comot.messaging.api.ServerCluster;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
+
 
 /**
  *
