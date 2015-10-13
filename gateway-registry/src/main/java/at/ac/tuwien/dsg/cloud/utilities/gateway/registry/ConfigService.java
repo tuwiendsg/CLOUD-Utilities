@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
-import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

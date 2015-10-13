@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry.tasks;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public interface Task<T> extends Runnable {
-	public void setBody(T object);
+public interface DiscoveryService {
+	DiscoveryResponse discover(DiscoveryRequest request);
 }

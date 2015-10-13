@@ -3,16 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry.listener;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
-import at.ac.tuwien.dsg.comot.gateway.registry.ConfigService;
-import at.ac.tuwien.dsg.comot.gateway.registry.RegistryService;
-import at.ac.tuwien.dsg.comot.gateway.registry.tasks.Task;
-import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
-import at.ac.tuwien.dsg.comot.messaging.api.Message;
-import at.ac.tuwien.dsg.comot.messaging.api.MessageReceivedListener;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.ConfigService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DiscoveryRESTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -32,8 +33,7 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 	protected AListener(RegistryService service, ConfigService config, 
 			String channelName, Class<T> taskClazz) {
 		this.consumer = ComotMessagingFactory
-				.getRabbitMqConsumer()
-				.withLightweigthSalsaDiscovery(config.getConfig())
+				.getRabbitMqConsumer(new DiscoveryRESTService(config.getConfig()))
 				.addMessageReceivedListener(this)
 				.withType(channelName);
 		

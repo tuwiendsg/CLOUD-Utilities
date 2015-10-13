@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry.tasks;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks;
 
-import at.ac.tuwien.dsg.comot.gateway.registry.RegistryService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 
 /**
  *

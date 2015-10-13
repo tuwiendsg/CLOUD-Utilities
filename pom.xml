@@ -10,8 +10,8 @@
 	<modules>
 		<module>messaging-api</module>
 		<module>messaging-lightweight</module>
+		<module>gateway-adapter</module>
 		<module>gateway-registry</module>
-	 <module>gateway-adapter</module>
 	</modules>
 	
 	<properties>

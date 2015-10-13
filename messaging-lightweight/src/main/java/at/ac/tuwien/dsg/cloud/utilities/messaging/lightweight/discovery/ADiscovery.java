@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.discovery;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 

@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
-import at.ac.tuwien.dsg.comot.gateway.registry.tasks.Task;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>at.ac.tuwien.dsg.comot</groupId>
-        <artifactId>comot-utilities</artifactId>
+        <groupId>at.ac.tuwien.dsg.cloud.utilities</groupId>
+        <artifactId>cloud-utilities</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>gateway-adapter</artifactId>
     <packaging>jar</packaging>
-	<name>COMOT Gateway Adapter</name>
+	<name>CLOUD Gateway Adapter</name>
     <build>
         <plugins>
             <plugin>
@@ -24,26 +24,30 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>at.ac.tuwien.dsg.comot</groupId>
+            <groupId>at.ac.tuwien.dsg.cloud.utilities</groupId>
             <artifactId>messaging-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>at.ac.tuwien.dsg.comot</groupId>
+            <groupId>at.ac.tuwien.dsg.cloud.utilities</groupId>
             <artifactId>messaging-lightweight</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+		
+		<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <type>jar</type>
+			<version>2.6.2</version>
+        </dependency>
+		
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>com.springsource.com.fasterxml.jackson.core.jackson-databind</artifactId>
-            <version>2.0.2</version>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.4.6</version>
             <type>jar</type>
         </dependency>
     </dependencies>

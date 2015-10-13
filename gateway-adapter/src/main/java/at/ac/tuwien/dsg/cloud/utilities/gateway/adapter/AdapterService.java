@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.adapter;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 
 /**
  *

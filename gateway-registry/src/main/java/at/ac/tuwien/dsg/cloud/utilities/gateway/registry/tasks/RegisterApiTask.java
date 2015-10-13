@@ -3,16 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry.tasks;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
-import at.ac.tuwien.dsg.comot.gateway.registry.ConfigService;
-import at.ac.tuwien.dsg.comot.gateway.registry.RegistryService;
-import at.ac.tuwien.dsg.comot.messaging.api.Message;
-import at.ac.tuwien.dsg.comot.messaging.api.Producer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.ConfigService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DiscoveryRESTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,10 @@ public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
 		super.setBody(object);
 		
 		this.producer = ComotMessagingFactory
-				.getRabbitMqProducer()
-				.withLightweightDiscovery(this.confService.getConfig());
+				.getRabbitMqProducer(
+						new DiscoveryRESTService(
+								this.confService.getConfig()
+						)
+				);
 	}
 }

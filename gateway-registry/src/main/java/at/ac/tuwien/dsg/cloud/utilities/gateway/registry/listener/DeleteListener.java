@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.registry.listener;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
-import at.ac.tuwien.dsg.comot.gateway.registry.ConfigService;
-import at.ac.tuwien.dsg.comot.gateway.registry.RegistryService;
-import at.ac.tuwien.dsg.comot.gateway.registry.tasks.DeleteApiTask;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.ConfigService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

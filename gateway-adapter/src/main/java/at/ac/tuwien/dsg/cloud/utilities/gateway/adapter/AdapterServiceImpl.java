@@ -3,17 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.gateway.adapter;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.APIResponseObject;
-import at.ac.tuwien.dsg.comot.gateway.adapter.model.ChannelWrapper;
-import at.ac.tuwien.dsg.comot.messaging.api.Consumer;
-import at.ac.tuwien.dsg.comot.messaging.api.Message;
-import at.ac.tuwien.dsg.comot.messaging.api.MessageReceivedListener;
-import at.ac.tuwien.dsg.comot.messaging.api.Producer;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DiscoveryRESTService;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,16 +37,17 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	private final ConcurrentHashMap<String, APIResponseObject> registeredAPIs;
 
 	public AdapterServiceImpl(Config config) {
+		
+		DiscoveryRESTService discovery = new DiscoveryRESTService(config);
+		
 		this.producer = ComotMessagingFactory
-				.getRabbitMqProducer()
-				.withLightweightDiscovery(config);
+				.getRabbitMqProducer(discovery);
 
 		//todo: fix response idetifier generation
 		this.generatedChannelName = "generateTypeIdentifier";
 
 		this.consumer = ComotMessagingFactory
-				.getRabbitMqConsumer()
-				.withLightweigthSalsaDiscovery(config)
+				.getRabbitMqConsumer(discovery)
 				.withType(this.generatedChannelName)
 				.addMessageReceivedListener(this);
 
