@@ -11,4 +11,5 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
  */
 public interface DiscoveryService {
 	DiscoveryResponse discover(DiscoveryRequest request);
+	boolean isDeployed();
 }

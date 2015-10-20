@@ -11,6 +11,9 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
@@ -26,10 +29,22 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class RegistryService {
 
+	@Autowired
+	private RestDiscoveryServiceWrapper discovery;
 	private ExecutorService executorService;
 
 	public RegistryService() {
 		this.executorService = Executors.newCachedThreadPool();
+	}
+
+	@PostConstruct
+	public void startup() {
+		this.executorService.execute(discovery);
+	}
+
+	@PreDestroy
+	public void destroy() {
+		this.discovery.shutdown();
 	}
 
 	public void execute(Task task) {
@@ -54,7 +69,7 @@ public class RegistryService {
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<APIResponseObject> resp = restTemplate
 				.exchange(requestEntity, APIResponseObject.class);
-		
+
 		return resp.getBody();
 	}
 

@@ -32,6 +32,7 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 	
 	protected AListener(RegistryService service, ConfigService config, 
 			String channelName, Class<T> taskClazz) {
+		
 		this.consumer = ComotMessagingFactory
 				.getRabbitMqConsumer(new DiscoveryRESTService(config.getConfig()))
 				.addMessageReceivedListener(this)

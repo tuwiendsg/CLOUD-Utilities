@@ -9,18 +9,17 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.DiscoveryRequest;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.DiscoveryResponse;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
+import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -30,7 +29,7 @@ import org.springframework.web.client.RestTemplate;
 public class DiscoveryRESTService extends ADiscovery implements Discovery {
 
 	//todo: use other config: this here are ip and port of the discovery
-		// and not of SALSA
+	// and not of SALSA
 	private Config config;
 	private final String restCommand = "/discover";
 
@@ -38,16 +37,44 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 		this.config = config;
 	}
 
+	public boolean checkForDiscovery() {
+		try {
+			URI statusUri = UriBuilder.fromPath("/isDeployed")
+					.host(config.getSalsaIp())
+					.port(config.getSalsaPort())
+					.scheme("http")
+					.build();
+
+			HttpUriRequest request = new HttpGet(restCommand);
+			HttpClient client = new DefaultHttpClient();
+			HttpResponse resp = client.execute(request);
+			if (resp.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+				return true;
+			}
+		} catch (IllegalStateException ex) {
+			if (!ex.getMessage().equals("Target host is null")) {
+				throw ex;
+			}
+		} catch (IOException ex) {
+		}
+
+		return false;
+	}
+
 	@Override
 	public String discoverHost() {
-		URI statusUri = UriBuilder.fromPath(restCommand).build();
-		
+		URI statusUri = UriBuilder.fromPath(restCommand)
+				.host(config.getSalsaIp())
+				.port(config.getSalsaPort())
+				.scheme("http")
+				.build();
+
 		DiscoveryRequest request = new DiscoveryRequest()
 				.setServiceName(config.getServiceName());
 		RestTemplate template = new RestTemplate();
-		DiscoveryResponse response = template.exchange(statusUri, 
-				HttpMethod.POST, 
-				new HttpEntity<>(request), 
+		DiscoveryResponse response = template.exchange(statusUri,
+				HttpMethod.POST,
+				new HttpEntity<>(request),
 				DiscoveryResponse.class).getBody();
 
 		return super.discoverHost(response.getServiceIp());

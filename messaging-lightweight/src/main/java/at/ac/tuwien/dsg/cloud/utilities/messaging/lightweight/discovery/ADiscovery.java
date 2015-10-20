@@ -26,7 +26,7 @@ public abstract class ADiscovery implements Discovery {
 	
 	protected Discovery backup;
 	
-	public String discoverHost(String host) {		
+	protected String discoverHost(String host) {		
 		if(host == null && backup != null) {
 			return backup.discoverHost();
 		}

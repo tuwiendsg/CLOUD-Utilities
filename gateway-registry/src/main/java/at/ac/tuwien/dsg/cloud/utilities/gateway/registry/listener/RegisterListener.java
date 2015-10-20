@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-@Component
 public class RegisterListener extends AListener<APIObject, RegisterApiTask> {
 	
 	@Autowired
