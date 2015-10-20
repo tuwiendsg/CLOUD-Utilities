@@ -5,10 +5,10 @@
  */
 package at.ac.tuwien.dsg.comot.kongtestservice;
 
-import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterService;
-import at.ac.tuwien.dsg.comot.gateway.adapter.AdapterServiceImpl;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterServiceImpl;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
-import at.ac.tuwien.dsg.comot.messaging.lightweight.util.Config;
 import java.net.SocketException;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;

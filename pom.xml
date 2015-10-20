@@ -29,12 +29,12 @@
 			<version>6.8.1</version>
 			<scope>test</scope>
 		</dependency>
-	 <dependency>
-	  <groupId>at.ac.tuwien.dsg.comot</groupId>
-	  <artifactId>gateway-adapter</artifactId>
-	  <version>0.0.1-SNAPSHOT</version>
-	  <type>jar</type>
-	 </dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.dsg.cloud.utilities</groupId>
+			<artifactId>gateway-adapter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 	
 	<build>
