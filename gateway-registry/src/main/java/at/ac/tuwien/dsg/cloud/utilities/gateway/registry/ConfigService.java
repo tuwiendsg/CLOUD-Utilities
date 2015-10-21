@@ -33,9 +33,9 @@ public class ConfigService {
 
 			Config config = new Config();
 			config.setSalsaIp(properties
-					.getProperty("salsa.ip", "128.130.172.215"))
+					.getProperty("salsa.ip", "128.130.172.214"))
 					.setSalsaPort(Integer.valueOf(properties
-									.getProperty("salsa.port", "8080")))
+									.getProperty("salsa.port", "8580")))
 					.setServiceName(properties
 							.getProperty("salsa.service", "ManualTestRabbitService"));
 			return config;
