@@ -33,8 +33,8 @@ public class KongTestService {
 	public KongTestService() {
 		
 		Config config = new Config();
-		config.setSalsaIp("128.130.172.215")
-				.setSalsaPort(8080)
+		config.setSalsaIp("128.130.172.214")
+				.setSalsaPort(8580)
 				.setServiceName("ManualTestRabbitService");
 		
 		this.adapterService = new AdapterServiceImpl(config);
