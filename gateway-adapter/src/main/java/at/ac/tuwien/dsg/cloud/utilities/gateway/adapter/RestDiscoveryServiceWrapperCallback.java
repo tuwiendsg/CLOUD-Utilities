@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public interface Discovery {
-	String discoverHost();
-	void setBackup(Discovery backup);
-	boolean checkForDiscovery();
+public interface RestDiscoveryServiceWrapperCallback {
+	void discoveryIsOnline();
 }

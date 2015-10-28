@@ -58,7 +58,7 @@ public class APIObjectAdapter implements Adapter {
 	}
 
 	@Override
-	public void send() {
+	public void send() throws NoDiscoveryException {
 		this.adapterService.send(this.object);
 	}
 	

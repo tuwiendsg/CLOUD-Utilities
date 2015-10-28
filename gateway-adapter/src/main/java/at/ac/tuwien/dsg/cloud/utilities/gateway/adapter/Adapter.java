@@ -16,5 +16,5 @@ public interface Adapter {
 	Adapter doStripPath(boolean stripPath);
 	Adapter doPreserveHost(boolean preserveHost);
 	Adapter withTargetUrl(String targetUrl);
-	void send();
+	void send() throws NoDiscoveryException;
 }

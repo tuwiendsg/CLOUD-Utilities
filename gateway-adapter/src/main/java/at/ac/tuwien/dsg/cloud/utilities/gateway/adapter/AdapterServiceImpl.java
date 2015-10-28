@@ -13,7 +13,6 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DiscoveryRESTService;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -24,7 +23,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class AdapterServiceImpl implements AdapterService, MessageReceivedListener {
+public class AdapterServiceImpl implements AdapterService, MessageReceivedListener, 
+		RestDiscoveryServiceWrapperCallback {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AdapterServiceImpl.class);
 	
 	private Producer producer;
@@ -33,13 +33,26 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 	private String generatedChannelName;
 	private ObjectMapper mapper;
-
+	private RestDiscoveryServiceWrapper discovery;
+	
+	private boolean cachingMode;
+	private final ConcurrentHashMap<String, APIObject> cachedAPIs;
 	private final ConcurrentHashMap<String, APIResponseObject> registeredAPIs;
 
 	public AdapterServiceImpl(Config config) {
-		
-		DiscoveryRESTService discovery = new DiscoveryRESTService(config);
-		
+		this(config, false);
+	}
+	
+	public AdapterServiceImpl(Config config, boolean cachingMode) {
+		this.cachingMode = cachingMode;
+		this.registeredAPIs = new ConcurrentHashMap<>();
+		this.mapper = new ObjectMapper();
+		this.cachedAPIs = new ConcurrentHashMap<>();
+		this.discovery = new RestDiscoveryServiceWrapper(config, this);
+	}
+	
+	@Override
+	public void discoveryIsOnline() {
 		this.producer = ComotMessagingFactory
 				.getRabbitMqProducer(discovery);
 
@@ -50,16 +63,37 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 				.getRabbitMqConsumer(discovery)
 				.withType(this.generatedChannelName)
 				.addMessageReceivedListener(this);
-
-		this.registeredAPIs = new ConcurrentHashMap<>();
-		this.mapper = new ObjectMapper();
+		
+		if(this.cachingMode) {
+			this.cachedAPIs.values().stream().forEach(api -> {
+				try {
+					this.send(api);
+				} catch (NoDiscoveryException ex) {
+					//not possible
+				}
+			});
+			
+			this.cachedAPIs.clear();
+		}
 	}
 
+	@Override
 	public Adapter createApiAdapter() {
 		return new APIObjectAdapter(this);
 	}
 
-	public void send(APIObject api) {
+	@Override
+	public void send(APIObject api) throws NoDiscoveryException {
+		if(this.generatedChannelName == null) {
+			if(this.cachingMode) {
+				this.cachedAPIs.put(api.targetUrl, api);
+				return;
+			}
+			
+			throw new NoDiscoveryException("A discovery service could not be "
+					+ "found.");
+		}
+				
 		try {
 			ChannelWrapper wrappedMsg = new ChannelWrapper<APIObject>();
 			wrappedMsg.setBody(api);
@@ -78,10 +112,18 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 		}
 	}
 
+	@Override
 	public void delete(String targetUrl) {
+		if(this.cachingMode) {
+			if(this.cachedAPIs.containsKey(targetUrl)) {
+				this.cachedAPIs.remove(targetUrl);
+			}
+		}
+		
 		if (this.registeredAPIs.containsKey(targetUrl)) {
 			APIResponseObject api = this.registeredAPIs.get(targetUrl);
 			this.deleteApi(api);
+			this.registeredAPIs.remove(targetUrl);
 		}
 	}
 
@@ -101,7 +143,12 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 		}
 	}
 
+	@Override
 	public void unregisterAllApis() {
+		if(this.cachingMode) {
+			this.cachedAPIs.clear();
+		}
+		
 		this.registeredAPIs.values().stream().forEach(api -> {
 			this.deleteApi(api);
 		});
@@ -118,4 +165,6 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 			logger.error("Failed to read message.", ex);
 		}
 	}
+
+	
 }

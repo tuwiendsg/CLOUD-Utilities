@@ -5,6 +5,8 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapper;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapperCallback;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
@@ -13,9 +15,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -27,18 +33,22 @@ import org.springframework.web.client.RestTemplate;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 @SpringBootApplication
-public class RegistryService {
+public class RegistryService implements RestDiscoveryServiceWrapperCallback,
+		ApplicationContextAware {
 
-	@Autowired
 	private RestDiscoveryServiceWrapper discovery;
 	private ExecutorService executorService;
+	private AnnotationConfigEmbeddedWebApplicationContext ac;
+	@Autowired
+	private ConfigService service;
 
 	public RegistryService() {
-		this.executorService = Executors.newCachedThreadPool();
 	}
 
 	@PostConstruct
 	public void startup() {
+		this.executorService = Executors.newCachedThreadPool();
+		this.discovery = new RestDiscoveryServiceWrapper(service.getConfig(), this);
 		this.executorService.execute(discovery);
 	}
 
@@ -78,5 +88,16 @@ public class RegistryService {
 	 */
 	public static void main(String[] args) {
 		SpringApplication.run(RegistryService.class, args);
+	}
+
+	@Override
+	public void discoveryIsOnline() {
+		this.ac.register(PostDiscoveryBeans.class);
+		this.ac.refresh();
+	}
+	
+	@Override
+	public void setApplicationContext(ApplicationContext ac) throws BeansException {
+		this.ac = (AnnotationConfigEmbeddedWebApplicationContext) ac;
 	}
 }

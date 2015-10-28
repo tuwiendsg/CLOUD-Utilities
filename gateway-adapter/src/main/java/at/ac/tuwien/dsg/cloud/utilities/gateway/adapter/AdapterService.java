@@ -14,6 +14,6 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 public interface AdapterService {
 	Adapter createApiAdapter();
 	void unregisterAllApis();
-	void send(APIObject object);
+	void send(APIObject object) throws NoDiscoveryException;
 	void delete(String targetUrl);
 }
