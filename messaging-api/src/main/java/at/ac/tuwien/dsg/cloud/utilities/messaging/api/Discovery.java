@@ -12,5 +12,4 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
 public interface Discovery {
 	String discoverHost();
 	void setBackup(Discovery backup);
-	boolean checkForDiscovery();
 }

@@ -35,10 +35,6 @@ public abstract class ARabbitChannel {
 	protected ARabbitChannel(Discovery discovery) {
 		try {			
 			factory = new ConnectionFactory();
-			
-			//todo: how to abstract discovery so that in case of a bean service we can manage the constructor errors correctly
-			if(discovery.checkForDiscovery())
-			
 			factory.setHost(discovery.discoverHost());
 			connection = factory.newConnection();
 			channel = connection.createChannel();
