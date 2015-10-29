@@ -7,9 +7,11 @@ package at.ac.tuwien.dsg.comot.kongtestservice;
 
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterServiceImpl;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.NoDiscoveryException;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
 import java.net.SocketException;
+import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,7 @@ public class KongTestService {
 				.setSalsaPort(8580)
 				.setServiceName("ManualTestRabbitService");
 		
-		this.adapterService = new AdapterServiceImpl(config);
+		this.adapterService = new AdapterServiceImpl(config, true);
 		
 		try {
 			String ip = NetworkService.getIp();
@@ -55,6 +57,8 @@ public class KongTestService {
 					.send();
 		} catch (SocketException ex) {
 			logger.error("Error with extracting IP.", ex);
+		} catch (NoDiscoveryException ex) {
+			logger.error("Error while sending API.", ex);
 		}
 	}
 	
