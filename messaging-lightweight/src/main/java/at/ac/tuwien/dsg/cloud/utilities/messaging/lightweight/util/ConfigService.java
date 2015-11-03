@@ -3,20 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util;
 
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-@Service
 public class ConfigService {
 	
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(ConfigService.class);
@@ -32,12 +29,12 @@ public class ConfigService {
 			propStream.close();
 
 			Config config = new Config();
-			config.setSalsaIp(properties
-					.getProperty("salsa.ip", "128.130.172.214"))
-					.setSalsaPort(Integer.valueOf(properties
-									.getProperty("salsa.port", "8580")))
+			config.setDiscoveryIp(properties
+					.getProperty("discovery.ip", "128.130.172.214"))
+					.setDiscoveryPort(Integer.valueOf(properties
+									.getProperty("discovery.port", "8580")))
 					.setServiceName(properties
-							.getProperty("salsa.service", "ManualTestRabbitService"));
+							.getProperty("discovery.service", "ManualTestRabbitService"));
 			return config;
 		} catch (IOException ex) {
 			logger.error("Could not retrieve config!", ex);

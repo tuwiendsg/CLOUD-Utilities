@@ -5,6 +5,9 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
 
+import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryRequest;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryResponse;
+
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>

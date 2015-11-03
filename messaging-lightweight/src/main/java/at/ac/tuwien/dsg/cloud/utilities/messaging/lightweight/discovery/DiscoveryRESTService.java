@@ -6,8 +6,8 @@
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.DiscoveryRequest;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.DiscoveryResponse;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryRequest;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryResponse;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
 import java.io.IOException;
 import java.net.URI;
@@ -40,12 +40,12 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 	public boolean checkForDiscovery() {
 		try {
 			URI statusUri = UriBuilder.fromPath("/isDeployed")
-					.host(config.getSalsaIp())
-					.port(config.getSalsaPort())
+					.host(config.getDiscoveryIp())
+					.port(config.getDiscoveryPort())
 					.scheme("http")
 					.build();
 
-			HttpUriRequest request = new HttpGet(restCommand);
+			HttpUriRequest request = new HttpGet(statusUri);
 			HttpClient client = new DefaultHttpClient();
 			HttpResponse resp = client.execute(request);
 			if (resp.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
@@ -64,8 +64,8 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 	@Override
 	public String discoverHost() {
 		URI statusUri = UriBuilder.fromPath(restCommand)
-				.host(config.getSalsaIp())
-				.port(config.getSalsaPort())
+				.host(config.getDiscoveryIp())
+				.port(config.getDiscoveryPort())
 				.scheme("http")
 				.build();
 

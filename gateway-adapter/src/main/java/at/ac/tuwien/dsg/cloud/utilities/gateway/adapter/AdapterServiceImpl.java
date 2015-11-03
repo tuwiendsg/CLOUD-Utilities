@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class AdapterServiceImpl implements AdapterService, MessageReceivedListener, 
-		RestDiscoveryServiceWrapperCallback {
+		RestDiscoveryServiceWrapperCallback, Shutdownable {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AdapterServiceImpl.class);
 	
 	private Producer producer;
@@ -52,7 +52,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	}
 	
 	@Override
-	public void discoveryIsOnline() {
+	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
 		this.producer = ComotMessagingFactory
 				.getRabbitMqProducer(discovery);
 
@@ -164,6 +164,11 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 		} catch (IOException ex) {
 			logger.error("Failed to read message.", ex);
 		}
+	}
+
+	@Override
+	public void shutdown() {
+		this.discovery.shutdown();
 	}
 
 	

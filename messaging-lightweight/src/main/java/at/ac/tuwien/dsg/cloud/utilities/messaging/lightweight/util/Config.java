@@ -20,25 +20,25 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class Config<T extends Config> {	
-	private String salsaIp;
-	private int salsaPort;
+	private String discoveryIp;
+	private int discoveryPort;
 	private String serviceName;
 
-	public String getSalsaIp() {
-		return salsaIp;
+	public String getDiscoveryIp() {
+		return discoveryIp;
 	}
 
-	public T setSalsaIp(String salsaIp) {
-		this.salsaIp = salsaIp;
+	public T setDiscoveryIp(String salsaIp) {
+		this.discoveryIp = salsaIp;
 		return (T)this;
 	}
 
-	public int getSalsaPort() {
-		return salsaPort;
+	public int getDiscoveryPort() {
+		return discoveryPort;
 	}
 
-	public T setSalsaPort(int salsaPort) {
-		this.salsaPort = salsaPort;
+	public T setDiscoveryPort(int salsaPort) {
+		this.discoveryPort = salsaPort;
 		return (T)this;
 	}
 

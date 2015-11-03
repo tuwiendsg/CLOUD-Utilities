@@ -6,14 +6,12 @@
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.ConfigService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DiscoveryRESTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -30,11 +28,11 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 	private Consumer consumer;
 	private Class<T> taskClazz;
 	
-	protected AListener(RegistryService service, ConfigService config, 
-			String channelName, Class<T> taskClazz) {
+	protected AListener(RegistryService service, String channelName, 
+			Class<T> taskClazz) {
 		
 		this.consumer = ComotMessagingFactory
-				.getRabbitMqConsumer(new DiscoveryRESTService(config.getConfig()))
+				.getRabbitMqConsumer(service.getDiscovery())
 				.addMessageReceivedListener(this)
 				.withType(channelName);
 		

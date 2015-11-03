@@ -19,16 +19,14 @@ public class PostDiscoveryBeans {
 	
 	@Autowired
 	private RegistryService registryService;
-	@Autowired
-	private ConfigService configService;
 	
 	@Bean
 	public DeleteListener deleteListener() {
-		return new DeleteListener(registryService, configService);
+		return new DeleteListener(registryService);
 	}
 	
 	@Bean
 	public RegisterListener registerListener() {
-		return new RegisterListener(registryService, configService);
+		return new RegisterListener(registryService);
 	}
 }

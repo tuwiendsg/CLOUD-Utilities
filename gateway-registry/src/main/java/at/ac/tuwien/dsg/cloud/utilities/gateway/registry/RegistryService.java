@@ -5,12 +5,18 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.ConfigService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapper;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapperCallback;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.Shutdownable;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.CachingDiscovery;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
@@ -36,25 +42,32 @@ import org.springframework.web.client.RestTemplate;
 public class RegistryService implements RestDiscoveryServiceWrapperCallback,
 		ApplicationContextAware {
 
-	private RestDiscoveryServiceWrapper discovery;
+	private Discovery discovery;
 	private ExecutorService executorService;
 	private AnnotationConfigEmbeddedWebApplicationContext ac;
-	@Autowired
-	private ConfigService service;
+	private List<Shutdownable> shutdownables;
 
 	public RegistryService() {
 	}
 
 	@PostConstruct
 	public void startup() {
+		this.shutdownables = new ArrayList<Shutdownable>();
 		this.executorService = Executors.newCachedThreadPool();
-		this.discovery = new RestDiscoveryServiceWrapper(service.getConfig(), this);
-		this.executorService.execute(discovery);
+		ConfigService service = new ConfigService();
+		RestDiscoveryServiceWrapper discovery = 
+				new RestDiscoveryServiceWrapper(service.getConfig(), this, 
+						this.executorService);
+		
+		this.shutdownables.add(discovery);
 	}
 
 	@PreDestroy
 	public void destroy() {
-		this.discovery.shutdown();
+		this.shutdownables.stream().forEach(s -> {
+			s.shutdown();
+		});
+		this.executorService.shutdown();
 	}
 
 	public void execute(Task task) {
@@ -91,7 +104,9 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback,
 	}
 
 	@Override
-	public void discoveryIsOnline() {
+	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
+		this.discovery = new CachingDiscovery(wrapper);
+		this.shutdownables.remove(wrapper);
 		this.ac.register(PostDiscoveryBeans.class);
 		this.ac.refresh();
 	}
@@ -99,5 +114,9 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback,
 	@Override
 	public void setApplicationContext(ApplicationContext ac) throws BeansException {
 		this.ac = (AnnotationConfigEmbeddedWebApplicationContext) ac;
+	}
+	
+	public Discovery getDiscovery() {
+		return this.discovery;
 	}
 }

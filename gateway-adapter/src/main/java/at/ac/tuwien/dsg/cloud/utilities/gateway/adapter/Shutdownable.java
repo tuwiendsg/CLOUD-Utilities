@@ -9,6 +9,6 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public interface RestDiscoveryServiceWrapperCallback {
-	void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper);
+public interface Shutdownable {
+	void shutdown();
 }
