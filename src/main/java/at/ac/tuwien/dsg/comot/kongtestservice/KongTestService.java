@@ -9,9 +9,9 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterServiceImpl;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.NoDiscoveryException;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.ConfigService;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
 import java.net.SocketException;
-import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +34,7 @@ public class KongTestService {
 	
 	public KongTestService() {
 		
-		Config config = new Config();
-		config.setSalsaIp("128.130.172.214")
-				.setSalsaPort(8580)
-				.setServiceName("ManualTestRabbitService");
+		Config config = new ConfigService().getConfig();
 		
 		this.adapterService = new AdapterServiceImpl(config, true);
 		
