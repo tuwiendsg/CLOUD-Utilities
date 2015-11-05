@@ -12,6 +12,9 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.Shutdownable;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.AListener;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.CachingDiscovery;
 import java.net.URI;
@@ -21,13 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +37,12 @@ import org.springframework.web.client.RestTemplate;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 @SpringBootApplication
-public class RegistryService implements RestDiscoveryServiceWrapperCallback,
-		ApplicationContextAware {
+public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 
 	private Discovery discovery;
 	private ExecutorService executorService;
-	private AnnotationConfigEmbeddedWebApplicationContext ac;
 	private List<Shutdownable> shutdownables;
+	private List<AListener> listeners;
 
 	public RegistryService() {
 	}
@@ -59,6 +56,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback,
 				new RestDiscoveryServiceWrapper(service.getConfig(), this, 
 						this.executorService);
 		
+		this.listeners = new ArrayList<>();
 		this.shutdownables.add(discovery);
 	}
 
@@ -107,13 +105,8 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback,
 	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
 		this.discovery = new CachingDiscovery(wrapper);
 		this.shutdownables.remove(wrapper);
-		this.ac.register(PostDiscoveryBeans.class);
-		this.ac.refresh();
-	}
-	
-	@Override
-	public void setApplicationContext(ApplicationContext ac) throws BeansException {
-		this.ac = (AnnotationConfigEmbeddedWebApplicationContext) ac;
+		this.listeners.add(new RegisterListener(this));
+		this.listeners.add(new DeleteListener(this));
 	}
 	
 	public Discovery getDiscovery() {

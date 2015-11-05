@@ -72,9 +72,11 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 		DiscoveryRequest request = new DiscoveryRequest()
 				.setServiceName(config.getServiceName());
 		RestTemplate template = new RestTemplate();
+		
+		//todo: find out why I can not send the object
 		DiscoveryResponse response = template.exchange(statusUri,
 				HttpMethod.POST,
-				new HttpEntity<>(request),
+				new HttpEntity(request),
 				DiscoveryResponse.class).getBody();
 
 		return super.discoverHost(response.getServiceIp());

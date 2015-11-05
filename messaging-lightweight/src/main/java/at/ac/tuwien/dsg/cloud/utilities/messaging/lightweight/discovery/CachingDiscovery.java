@@ -16,7 +16,7 @@ public class CachingDiscovery extends ADiscovery implements Discovery {
 	private String host;
 	
 	public CachingDiscovery(Discovery discovery) {
-		this.setBackup(backup);
+		this.setBackup(discovery);
 	}
 	
 	@Override
