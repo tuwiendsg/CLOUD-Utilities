@@ -16,6 +16,8 @@
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -24,11 +26,17 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
  */
 public abstract class ADiscovery implements Discovery {
 	
+	protected static Logger logger = LoggerFactory.getLogger(ADiscovery.class);
+	
 	protected Discovery backup;
 	
 	protected String discoverHost(String host) {		
 		if(host == null && backup != null) {
 			return backup.discoverHost();
+		}
+		
+		if(logger != null) {
+			logger.trace("Discovered host: {}", host);
 		}
 		
 		return host;

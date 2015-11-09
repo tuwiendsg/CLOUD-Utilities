@@ -17,6 +17,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -27,13 +28,13 @@ import org.springframework.web.client.RestTemplate;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class DiscoveryRESTService extends ADiscovery implements Discovery {
-
 	//todo: use other config: this here are ip and port of the discovery
 	// and not of SALSA
 	private Config config;
 	private final String restCommand = "/discover";
 
 	public DiscoveryRESTService(Config config) {
+		logger = LoggerFactory.getLogger(DiscoveryRESTService.class);
 		this.config = config;
 	}
 
