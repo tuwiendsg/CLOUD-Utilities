@@ -19,16 +19,20 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class RabbitMqConsumer implements Consumer, Runnable {	
+	private static Logger logger = LoggerFactory.getLogger(RabbitMqConsumer.class);
 	private List<MessageReceivedListener> messageListeners;
 	private ExecutorService threadPool;
 	private ReceivingChannel channel;
@@ -42,12 +46,15 @@ public class RabbitMqConsumer implements Consumer, Runnable {
 	@Override
 	public RabbitMqConsumer withType(String type) {
 		this.channel.bindType(type);
+		logger.trace("Started listening to {}.", type);
 		return this;
 	}
 
 	@Override
 	public Message getMessage() {
-		return this.channel.getDelivery();
+		Message msg = this.channel.getDelivery();
+		logger.trace("Received following message: {}", new String(msg.getMessage(), StandardCharsets.UTF_8));
+		return msg;
 	}
 
 	@Override

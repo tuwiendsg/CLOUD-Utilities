@@ -18,6 +18,7 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.SendingChannel;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,8 @@ public class RabbitMqProducer implements Producer {
 		}
 
 		RabbitMqMessage msg = (RabbitMqMessage) message;
+		
+		logger.trace("Sending following message: {}", new String(msg.getMessage(), StandardCharsets.UTF_8));
 
 		msg.getTypes().stream().forEach(type -> {
 			this.channel.sendMessage(type, msg);
