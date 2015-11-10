@@ -24,6 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
@@ -38,7 +40,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @SpringBootApplication
 public class RegistryService implements RestDiscoveryServiceWrapperCallback {
-
+	private static Logger logger = LoggerFactory.getLogger(RegistryService.class);
 	private Discovery discovery;
 	private ExecutorService executorService;
 	private List<Shutdownable> shutdownables;
@@ -49,6 +51,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 
 	@PostConstruct
 	public void startup() {
+		logger.trace("Starting post construct.");
 		this.shutdownables = new ArrayList<Shutdownable>();
 		this.executorService = Executors.newCachedThreadPool();
 		ConfigService service = new ConfigService();
@@ -103,6 +106,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 
 	@Override
 	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
+		logger.trace("Discovery done.");
 		this.discovery = new CachingDiscovery(wrapper);
 		this.shutdownables.remove(wrapper);
 		this.listeners.add(new RegisterListener(this));

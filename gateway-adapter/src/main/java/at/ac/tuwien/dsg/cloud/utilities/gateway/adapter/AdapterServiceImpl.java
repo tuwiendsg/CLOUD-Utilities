@@ -104,7 +104,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 			Message message = ComotMessagingFactory
 					.getRabbitMqMessage()
-					.withType("apiRegistry")
+					.withType("registerApiChannel")
 					.setMessage(mapper.writeValueAsBytes(wrappedMsg));
 
 			this.producer.sendMessage(message);

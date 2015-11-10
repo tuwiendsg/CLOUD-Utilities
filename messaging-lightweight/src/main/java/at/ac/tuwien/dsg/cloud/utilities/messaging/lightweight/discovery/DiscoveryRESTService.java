@@ -40,6 +40,7 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 
 	public boolean checkForDiscovery() {
 		try {
+			logger.trace("Checking for discovery!");
 			URI statusUri = UriBuilder.fromPath("/isDeployed")
 					.host(config.getDiscoveryIp())
 					.port(config.getDiscoveryPort())
@@ -49,6 +50,7 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 			HttpUriRequest request = new HttpGet(statusUri);
 			HttpClient client = new DefaultHttpClient();
 			HttpResponse resp = client.execute(request);
+			logger.trace("Got response: {}", resp.getStatusLine().getStatusCode());
 			if (resp.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 				return true;
 			}
