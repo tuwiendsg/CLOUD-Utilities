@@ -94,6 +94,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		ResponseEntity<APIResponseObject> resp = restTemplate
 				.exchange(requestEntity, APIResponseObject.class);
 
+		logger.trace("Response from Kong: {}", resp.getBody());
 		return resp.getBody();
 	}
 
