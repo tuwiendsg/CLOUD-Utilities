@@ -20,5 +20,10 @@ public class DeleteListener extends AListener<APIResponseObject, DeleteApiTask>{
 	public DeleteListener(RegistryService service) {
 		super(service, "deleteApi", DeleteApiTask.class);
 	}
+
+	@Override
+	protected Class getInnerClass() {
+		return APIResponseObject.class;
+	}
 	
 }

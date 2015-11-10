@@ -5,6 +5,7 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
@@ -12,7 +13,10 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.corba.se.spi.oa.OADefault;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import org.slf4j.LoggerFactory;
@@ -40,11 +44,14 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 		this.taskClazz = taskClazz;
 	}
 	
+	protected abstract Class getInnerClass();
+	
 	@Override
 	public void messageReceived(Message message) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			ChannelWrapper object = mapper.readValue(message.getMessage(), ChannelWrapper.class);
+			JavaType type = mapper.getTypeFactory().constructParametricType(ChannelWrapper.class, getInnerClass());
+			ChannelWrapper<O> object = mapper.readValue(message.getMessage(), type);
 			
 			T task = taskClazz.getConstructor(RegistryService.class)
 					.newInstance(this.registryService);

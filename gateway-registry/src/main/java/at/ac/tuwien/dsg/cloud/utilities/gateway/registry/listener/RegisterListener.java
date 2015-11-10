@@ -20,4 +20,9 @@ public class RegisterListener extends AListener<APIObject, RegisterApiTask> {
 	public RegisterListener(RegistryService service) {
 		super(service, "registerApiChannel", RegisterApiTask.class);
 	}
+
+	@Override
+	protected Class getInnerClass() {
+		return APIObject.class;
+	}
 }
