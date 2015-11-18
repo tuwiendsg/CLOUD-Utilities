@@ -12,12 +12,16 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
 import java.util.Collections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class NetworkService {
+	
+	private static Logger logger = LoggerFactory.getLogger(NetworkService.class);
 
 	public static String getIp() throws SocketException {
 		for (NetworkInterface nic : Collections.list(NetworkInterface.getNetworkInterfaces())) {
@@ -30,7 +34,9 @@ public class NetworkService {
 					socket.connect(new InetSocketAddress("google.com", 80));
 					//if everything passes the InetAddress should be okay.
 					socket.close();
-					return ad.getHostAddress();
+					String ip = ad.getHostAddress();
+					logger.trace("Found interface: {}", ip);
+					return ip;
 				} catch (IOException ex) {
 				}
 			}
