@@ -11,6 +11,7 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.NoDiscoveryException;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
 import java.net.SocketException;
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,11 @@ public class KongTestService {
 	private DiscoverySettings discoverySettings;
 	
 	public KongTestService() {		
+		
+	}
+	
+	@PostConstruct
+	private void init() {
 		this.adapterService = new AdapterServiceImpl(discoverySettings, true);
 		
 		try {
