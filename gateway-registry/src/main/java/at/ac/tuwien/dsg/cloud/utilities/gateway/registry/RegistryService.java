@@ -5,7 +5,6 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.ConfigService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapper;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapperCallback;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.Shutdownable;
@@ -17,6 +16,7 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.CachingDiscovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
@@ -45,6 +46,11 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private ExecutorService executorService;
 	private List<Shutdownable> shutdownables;
 	private List<AListener> listeners;
+	
+	@Autowired
+	private KongSettings kongSettings;
+	@Autowired
+	private DiscoverySettings discoverySettings;
 
 	public RegistryService() {
 	}
@@ -54,9 +60,9 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		logger.trace("Starting post construct.");
 		this.shutdownables = new ArrayList<Shutdownable>();
 		this.executorService = Executors.newCachedThreadPool();
-		ConfigService service = new ConfigService();
+		
 		RestDiscoveryServiceWrapper discovery = 
-				new RestDiscoveryServiceWrapper(service.getConfig(), this, 
+				new RestDiscoveryServiceWrapper(discoverySettings, this, 
 						this.executorService);
 		
 		this.listeners = new ArrayList<>();
@@ -74,18 +80,22 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	public void execute(Task task) {
 		this.executorService.execute(task);
 	}
+	
+	private String getUrlForKongApi() {
+		return String.format("http://%s:%d/%s/",kongSettings.getIp(), kongSettings.getPort(), "apis");
+	}
 
 	public void deleteApi(String id) {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.delete("http://128.130.172.214:8001/apis/" + id);
+			restTemplate.delete(this.getUrlForKongApi() + id);
 		} catch (HttpClientErrorException ex) {
 		}
 	}
 
 	public APIResponseObject registerApi(APIObject apiObject) {
 		RequestEntity<APIObject> requestEntity = RequestEntity
-				.put(URI.create("http://128.130.172.214:8001/apis/"))
+				.put(URI.create(this.getUrlForKongApi()))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.ALL)
 				.body(apiObject);

@@ -6,7 +6,7 @@
 package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DiscoveryRESTService;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,14 +21,14 @@ public class RestDiscoveryServiceWrapper extends DiscoveryRESTService implements
 	private RestDiscoveryServiceWrapperCallback cb;
 	private ExecutorService executor;
 	
-	public RestDiscoveryServiceWrapper(Config config, 
+	public RestDiscoveryServiceWrapper(DiscoverySettings settings, 
 			RestDiscoveryServiceWrapperCallback cb) {
-		this(config, cb, Executors.newFixedThreadPool(1));
+		this(settings, cb, Executors.newFixedThreadPool(1));
 	}
 	
-	public RestDiscoveryServiceWrapper(Config config, 
+	public RestDiscoveryServiceWrapper(DiscoverySettings settings, 
 			RestDiscoveryServiceWrapperCallback cb, ExecutorService external) {
-		super(config);
+		super(settings);
 		this.cb = cb;
 		this.executor = external;
 		this.executor.execute(this);

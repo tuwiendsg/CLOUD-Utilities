@@ -13,7 +13,7 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +29,6 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	
 	private Producer producer;
 	private Consumer consumer;
-	private Config config;
 
 	private String generatedChannelName;
 	private ObjectMapper mapper;
@@ -39,16 +38,16 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	private final ConcurrentHashMap<String, APIObject> cachedAPIs;
 	private final ConcurrentHashMap<String, APIResponseObject> registeredAPIs;
 
-	public AdapterServiceImpl(Config config) {
-		this(config, false);
+	public AdapterServiceImpl(DiscoverySettings settings) {
+		this(settings, false);
 	}
 	
-	public AdapterServiceImpl(Config config, boolean cachingMode) {
+	public AdapterServiceImpl(DiscoverySettings settings, boolean cachingMode) {
 		this.cachingMode = cachingMode;
 		this.registeredAPIs = new ConcurrentHashMap<>();
 		this.mapper = new ObjectMapper();
 		this.cachedAPIs = new ConcurrentHashMap<>();
-		this.discovery = new RestDiscoveryServiceWrapper(config, this);
+		this.discovery = new RestDiscoveryServiceWrapper(settings, this);
 	}
 	
 	@Override

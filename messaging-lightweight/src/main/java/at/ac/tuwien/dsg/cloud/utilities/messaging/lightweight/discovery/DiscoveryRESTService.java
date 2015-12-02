@@ -8,7 +8,7 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryRequest;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryResponse;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Config;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
@@ -30,20 +30,20 @@ import org.springframework.web.client.RestTemplate;
 public class DiscoveryRESTService extends ADiscovery implements Discovery {
 	//todo: use other config: this here are ip and port of the discovery
 	// and not of SALSA
-	private Config config;
+	private DiscoverySettings discoverySettings;
 	private final String restCommand = "/discover";
 
-	public DiscoveryRESTService(Config config) {
+	public DiscoveryRESTService(DiscoverySettings settings) {
 		logger = LoggerFactory.getLogger(DiscoveryRESTService.class);
-		this.config = config;
+		this.discoverySettings = settings;
 	}
 
 	public boolean checkForDiscovery() {
 		try {
-			logger.trace("Checking for discovery at IP {} with port {}!", config.getDiscoveryIp(), config.getDiscoveryPort());
+			logger.trace("Checking for discovery at IP {} with port {}!", discoverySettings.getIp(), discoverySettings.getPort());
 			URI statusUri = UriBuilder.fromPath("/isDeployed")
-					.host(config.getDiscoveryIp())
-					.port(config.getDiscoveryPort())
+					.host(discoverySettings.getIp())
+					.port(discoverySettings.getPort())
 					.scheme("http")
 					.build();
 
@@ -67,13 +67,13 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 	@Override
 	public String discoverHost() {
 		URI statusUri = UriBuilder.fromPath(restCommand)
-				.host(config.getDiscoveryIp())
-				.port(config.getDiscoveryPort())
+				.host(discoverySettings.getIp())
+				.port(discoverySettings.getPort())
 				.scheme("http")
 				.build();
 
 		DiscoveryRequest request = new DiscoveryRequest()
-				.setServiceName(config.getServiceName());
+				.setServiceName(discoverySettings.getServiceName());
 		RestTemplate template = new RestTemplate();
 		
 		//todo: find out why I can not send the object
