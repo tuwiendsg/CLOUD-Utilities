@@ -16,6 +16,8 @@
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -31,9 +33,11 @@ public abstract class ARabbitChannel {
 	protected ConnectionFactory factory;
 	protected Connection connection;
 	protected Channel channel;
+	protected Serializer<RabbitMqMessage> serializer;
 	
-	protected ARabbitChannel(Discovery discovery) {
+	protected ARabbitChannel(Discovery discovery, Serializer<RabbitMqMessage> serializer) {
 		try {			
+			this.serializer = serializer;
 			factory = new ConnectionFactory();
 			factory.setHost(discovery.discoverHost());
 			connection = factory.newConnection();

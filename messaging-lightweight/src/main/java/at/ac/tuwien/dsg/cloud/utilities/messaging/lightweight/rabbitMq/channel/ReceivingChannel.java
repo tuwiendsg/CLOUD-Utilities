@@ -18,6 +18,7 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqConsumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
@@ -36,10 +37,11 @@ public class ReceivingChannel extends ARabbitChannel {
 	private static Logger logger = LoggerFactory.getLogger(RabbitMqConsumer.class);
 
 	private String queueName;
-	QueueingConsumer consumer;
+	private QueueingConsumer consumer;
 	
-	public ReceivingChannel(Discovery discovery) {
-		super(discovery);
+	public ReceivingChannel(Discovery discovery, Serializer<RabbitMqMessage> serializer) {
+		super(discovery, serializer);
+		this.serializer = serializer;
 		try {
 			this.queueName = channel.queueDeclare().getQueue();
 			this.consumer = new QueueingConsumer(channel);
@@ -61,11 +63,8 @@ public class ReceivingChannel extends ARabbitChannel {
 		ObjectInputStream in = null;
 		try {
 			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			ByteArrayInputStream bais = new ByteArrayInputStream(delivery.getBody());
-			in = new ObjectInputStream(bais);
-			return (RabbitMqMessage) in.readObject();
+			return this.serializer.deserilize(delivery.getBody());
 		} catch (IOException | 
-				ClassNotFoundException | 
 				InterruptedException | 
 				ShutdownSignalException | 
 				ConsumerCancelledException ex) {

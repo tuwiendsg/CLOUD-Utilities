@@ -5,7 +5,6 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 
-import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
@@ -13,10 +12,8 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.corba.se.spi.oa.OADefault;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import org.slf4j.LoggerFactory;
@@ -31,9 +28,12 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 	protected RegistryService registryService;
 	private Consumer consumer;
 	private Class<T> taskClazz;
+	private Serializer<ChannelWrapper> serializer;
 	
 	protected AListener(RegistryService service, String channelName, 
 			Class<T> taskClazz) {
+		
+		this.serializer = new JacksonSerializer<ChannelWrapper>(ChannelWrapper.class);
 		
 		this.consumer = ComotMessagingFactory
 				.getRabbitMqConsumer(service.getDiscovery())
@@ -44,15 +44,12 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 		this.taskClazz = taskClazz;
 	}
 	
-	protected abstract Class getInnerClass();
+	protected abstract Class<O> getInnerClass();
 	
 	@Override
 	public void messageReceived(Message message) {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			JavaType type = mapper.getTypeFactory().constructParametricType(ChannelWrapper.class, getInnerClass());
-			ChannelWrapper<O> object = mapper.readValue(message.getMessage(), type);
-			
+		try {			
+			ChannelWrapper<O> object = serializer.withInnerType(getInnerClass()).deserilize(message.getMessage());
 			T task = taskClazz.getConstructor(RegistryService.class)
 					.newInstance(this.registryService);
 			task.setBody(object);

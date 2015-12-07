@@ -17,6 +17,7 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -31,17 +32,15 @@ public class SendingChannel extends ARabbitChannel {
 	
 	private static Logger logger = LoggerFactory.getLogger(SendingChannel.class);
 	
-	public SendingChannel(Discovery discovery) {
-		super(discovery);
+	public SendingChannel(Discovery discovery, Serializer<RabbitMqMessage> serializer) {
+		super(discovery, serializer);
 	}
 
 	public void sendMessage(String type, RabbitMqMessage msg) {
 		ObjectOutputStream out = null;
 		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			out = new ObjectOutputStream(baos);
-			out.writeObject(msg);
-			this.channel.basicPublish(ARabbitChannel.EXCHANGE_NAME, type, null, baos.toByteArray());
+			byte[] body = this.serializer.serialze(msg);
+			this.channel.basicPublish(ARabbitChannel.EXCHANGE_NAME, type, null, body);
 		} catch (IOException ex) {
 			logger.error(String.format("Error while sending message with type %s!", type), ex);
 		} finally {

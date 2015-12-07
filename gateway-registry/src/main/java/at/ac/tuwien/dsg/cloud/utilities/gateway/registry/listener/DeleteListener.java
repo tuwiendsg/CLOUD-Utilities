@@ -22,7 +22,7 @@ public class DeleteListener extends AListener<APIResponseObject, DeleteApiTask>{
 	}
 
 	@Override
-	protected Class getInnerClass() {
+	protected Class<APIResponseObject> getInnerClass() {
 		return APIResponseObject.class;
 	}
 	

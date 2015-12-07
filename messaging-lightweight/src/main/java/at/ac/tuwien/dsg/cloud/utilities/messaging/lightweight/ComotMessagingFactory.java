@@ -11,6 +11,7 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqM
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqProducer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.SendingChannel;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 
 
 
@@ -20,11 +21,11 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.S
  */
 public class ComotMessagingFactory {
 	public static RabbitMqConsumer getRabbitMqConsumer(Discovery discovery) {
-		return new RabbitMqConsumer(new ReceivingChannel(discovery));
+		return new RabbitMqConsumer(new ReceivingChannel(discovery, new JacksonSerializer(RabbitMqMessage.class)));
 	}
 	
 	public static RabbitMqProducer getRabbitMqProducer(Discovery discovery) {
-		return new RabbitMqProducer(new SendingChannel(discovery));
+		return new RabbitMqProducer(new SendingChannel(discovery, new JacksonSerializer(RabbitMqMessage.class)));
 	}
 	
 	public static RabbitMqMessage getRabbitMqMessage() {

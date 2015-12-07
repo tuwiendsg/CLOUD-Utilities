@@ -22,7 +22,7 @@ public class RegisterListener extends AListener<APIObject, RegisterApiTask> {
 	}
 
 	@Override
-	protected Class getInnerClass() {
+	protected Class<APIObject> getInnerClass() {
 		return APIObject.class;
 	}
 }

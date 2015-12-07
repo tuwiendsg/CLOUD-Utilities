@@ -14,7 +14,8 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.LoggerFactory;
@@ -31,12 +32,14 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	private Consumer consumer;
 
 	private String generatedChannelName;
-	private ObjectMapper mapper;
 	private RestDiscoveryServiceWrapper discovery;
 	
 	private boolean cachingMode;
 	private final ConcurrentHashMap<String, APIObject> cachedAPIs;
 	private final ConcurrentHashMap<String, APIResponseObject> registeredAPIs;
+	
+	private Serializer<ChannelWrapper> channelSerializer;
+	private Serializer<APIResponseObject> responseSerializer;
 
 	public AdapterServiceImpl(DiscoverySettings settings) {
 		this(settings, false);
@@ -45,9 +48,10 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	public AdapterServiceImpl(DiscoverySettings settings, boolean cachingMode) {
 		this.cachingMode = cachingMode;
 		this.registeredAPIs = new ConcurrentHashMap<>();
-		this.mapper = new ObjectMapper();
 		this.cachedAPIs = new ConcurrentHashMap<>();
 		this.discovery = new RestDiscoveryServiceWrapper(settings, this);
+		this.channelSerializer = new JacksonSerializer<>(ChannelWrapper.class);
+		this.responseSerializer = new JacksonSerializer<>(APIResponseObject.class);
 	}
 	
 	@Override
@@ -99,12 +103,11 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 			wrappedMsg.setResponseChannelName(this.generatedChannelName);
 
 			//todo: check object and throw exception if neccessary
-			ObjectMapper mapper = new ObjectMapper();
 
 			Message message = ComotMessagingFactory
 					.getRabbitMqMessage()
 					.withType("registerApiChannel")
-					.setMessage(mapper.writeValueAsBytes(wrappedMsg));
+					.setMessage(this.channelSerializer.serialze(wrappedMsg));
 
 			this.producer.sendMessage(message);
 		} catch (IOException ex) {
@@ -133,7 +136,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 			Message msg = ComotMessagingFactory
 					.getRabbitMqMessage()
-					.setMessage(mapper.writeValueAsBytes(wrappedMsg))
+					.setMessage(this.channelSerializer.serialze(wrappedMsg))
 					.withType("deleteApi");
 
 			this.producer.sendMessage(msg);
@@ -156,9 +159,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	@Override
 	public void messageReceived(Message message) {
 		try {
-			ObjectMapper mapper = new ObjectMapper();
-			APIResponseObject res = mapper.readValue(message.getMessage(),
-					APIResponseObject.class);
+			APIResponseObject res = this.responseSerializer.deserilize(message.getMessage());
 			this.registeredAPIs.put(res.getTargetUrl(), res);
 		} catch (IOException ex) {
 			logger.error("Failed to read message.", ex);
