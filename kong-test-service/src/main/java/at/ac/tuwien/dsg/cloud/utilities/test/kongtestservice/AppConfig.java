@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.kongtestservice;
+package at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice;
 
-import at.ac.tuwien.dsg.comot.kongtestservice.utilities.RequestLogInterceptor;
+import at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice.utilities.RequestLogInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

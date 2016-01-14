@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.kongtestservice;
+package at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import org.springframework.boot.context.properties.ConfigurationProperties;

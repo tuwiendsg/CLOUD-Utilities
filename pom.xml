@@ -12,7 +12,7 @@
 		<module>messaging-lightweight</module>
 		<module>gateway-adapter</module>
 		<module>gateway-registry</module>
-		<module>KongTestService</module>
+		<module>kong-test-service</module>
 	</modules>
 	
 	<properties>

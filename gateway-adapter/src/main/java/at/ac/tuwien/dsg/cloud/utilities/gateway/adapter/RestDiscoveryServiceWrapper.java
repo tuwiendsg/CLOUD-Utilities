@@ -24,8 +24,8 @@ import java.util.concurrent.Executors;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class RestDiscoveryServiceWrapper extends DiscoveryRESTService implements
-		Runnable, Shutdownable {
+public class RestDiscoveryServiceWrapper extends DiscoveryRESTService 
+		implements Runnable, Shutdownable {
 	
 	private boolean shutdown = false;
 	private RestDiscoveryServiceWrapperCallback cb;

@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.ac.tuwien.dsg.comot.kongtestservice;
+package at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice;
 
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterServiceImpl;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.NoDiscoveryException;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
-import at.ac.tuwien.dsg.comot.kongtestservice.utilities.NetworkService;
+import at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice.utilities.NetworkService;
 import java.net.SocketException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
