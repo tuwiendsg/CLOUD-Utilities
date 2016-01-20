@@ -170,6 +170,10 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	public void messageReceived(Message message) {
 		try {
 			APIResponseObject res = this.responseSerializer.deserilize(message.getMessage());
+			if(res.isError()) {
+				logger.error("Server responded with error! Msg: {}", res.getErrorMsg());
+				return;
+			}
 			this.registeredAPIs.put(res.getTargetUrl(), res);
 		} catch (IOException ex) {
 			logger.error("Failed to read message.", ex);

@@ -123,8 +123,12 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 			String serverResp = e.getResponseBodyAsString();
 			logger.error(String.format("Exception from server! "
 					+ "Following body was responded %s", serverResp), e);
+			
+			APIResponseObject resp = new APIResponseObject();
+			resp.setError(true);
+			resp.setErrorMsg(serverResp);
+			return resp;
 		}
-		return null;
 	}
 
 	/**

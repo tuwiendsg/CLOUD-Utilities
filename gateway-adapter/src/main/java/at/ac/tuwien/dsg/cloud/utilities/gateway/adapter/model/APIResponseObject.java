@@ -28,6 +28,8 @@ public class APIResponseObject {
 	private String targetUrl;
 	private boolean preserveHost;
 	private long createdAt;
+	private boolean error;
+	private String errorMsg;
 
 	public String getId() {
 		return id;
@@ -80,5 +82,20 @@ public class APIResponseObject {
 	public void setCreatedAt(long createdAt) {
 		this.createdAt = createdAt;
 	}
-	
+
+	public boolean isError() {
+		return error;
+	}
+
+	public void setError(boolean error) {
+		this.error = error;
+	}
+
+	public String getErrorMsg() {
+		return errorMsg;
+	}
+
+	public void setErrorMsg(String errorMsg) {
+		this.errorMsg = errorMsg;
+	}
 }
