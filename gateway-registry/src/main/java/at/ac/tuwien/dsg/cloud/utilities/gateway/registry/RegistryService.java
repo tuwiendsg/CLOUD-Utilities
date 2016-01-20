@@ -43,6 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -51,12 +52,13 @@ import org.springframework.web.client.RestTemplate;
  */
 @SpringBootApplication
 public class RegistryService implements RestDiscoveryServiceWrapperCallback {
+
 	private static Logger logger = LoggerFactory.getLogger(RegistryService.class);
 	private Discovery discovery;
 	private ExecutorService executorService;
 	private List<Shutdownable> shutdownables;
 	private List<AListener> listeners;
-	
+
 	@Autowired
 	private KongSettings kongSettings;
 	@Autowired
@@ -70,11 +72,11 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		logger.trace("Starting post construct.");
 		this.shutdownables = new ArrayList<Shutdownable>();
 		this.executorService = Executors.newCachedThreadPool();
-		
-		RestDiscoveryServiceWrapper discovery = 
-				new RestDiscoveryServiceWrapper(discoverySettings, this, 
+
+		RestDiscoveryServiceWrapper discovery
+				= new RestDiscoveryServiceWrapper(discoverySettings, this,
 						this.executorService);
-		
+
 		this.listeners = new ArrayList<>();
 		this.shutdownables.add(discovery);
 	}
@@ -90,9 +92,9 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	public void execute(Task task) {
 		this.executorService.execute(task);
 	}
-	
+
 	private String getUrlForKongApi() {
-		return String.format("http://%s:%d/%s/",kongSettings.getIp(), kongSettings.getPort(), "apis");
+		return String.format("http://%s:%d/%s/", kongSettings.getIp(), kongSettings.getPort(), "apis");
 	}
 
 	public void deleteApi(String id) {
@@ -104,18 +106,25 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	}
 
 	public APIResponseObject registerApi(APIObject apiObject) {
-		RequestEntity<APIObject> requestEntity = RequestEntity
-				.put(URI.create(this.getUrlForKongApi()))
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.ALL)
-				.body(apiObject);
+		try {
+			RequestEntity<APIObject> requestEntity = RequestEntity
+					.put(URI.create(this.getUrlForKongApi()))
+					.contentType(MediaType.APPLICATION_JSON)
+					.accept(MediaType.ALL)
+					.body(apiObject);
 
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<APIResponseObject> resp = restTemplate
-				.exchange(requestEntity, APIResponseObject.class);
+			RestTemplate restTemplate = new RestTemplate();
+			ResponseEntity<APIResponseObject> resp = restTemplate
+					.exchange(requestEntity, APIResponseObject.class);
 
-		logger.trace("Response from Kong: {}", resp.getBody());
-		return resp.getBody();
+			logger.trace("Response from Kong: {}", resp.getBody());
+			return resp.getBody();
+		} catch (HttpStatusCodeException e) {
+			String serverResp = e.getResponseBodyAsString();
+			logger.error(String.format("Exception from server! "
+					+ "Following body was responded %s", serverResp), e);
+		}
+		return null;
 	}
 
 	/**
@@ -133,7 +142,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		this.listeners.add(new RegisterListener(this));
 		this.listeners.add(new DeleteListener(this));
 	}
-	
+
 	public Discovery getDiscovery() {
 		return this.discovery;
 	}
