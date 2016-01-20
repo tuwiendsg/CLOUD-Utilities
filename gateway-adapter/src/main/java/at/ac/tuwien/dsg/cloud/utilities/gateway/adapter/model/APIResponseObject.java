@@ -47,7 +47,7 @@ public class APIResponseObject {
 		this.name = name;
 	}
 
-	@JsonProperty("public_dns")
+	@JsonProperty("request_host")
 	public String getPublicDns() {
 		return publicDns;
 	}
@@ -56,7 +56,7 @@ public class APIResponseObject {
 		this.publicDns = publicDns;
 	}
 
-	@JsonProperty("target_url")
+	@JsonProperty("upstream_url")
 	public String getTargetUrl() {
 		return targetUrl;
 	}

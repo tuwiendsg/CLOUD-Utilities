@@ -37,7 +37,7 @@ public class APIObject {
 		this.name = name;
 	}
 
-	@JsonProperty("public_dns")
+	@JsonProperty("request_host")
 	public String getPublicDns() {
 		return publicDns;
 	}
@@ -46,6 +46,7 @@ public class APIObject {
 		this.publicDns = publicDns;
 	}
 
+	@JsonProperty("request_path")
 	public String getPath() {
 		return path;
 	}
@@ -54,7 +55,7 @@ public class APIObject {
 		this.path = path;
 	}
 
-	@JsonProperty("strip_path")
+	@JsonProperty("strip_request_path")
 	public boolean isStripPath() {
 		return stripPath;
 	}
@@ -72,7 +73,7 @@ public class APIObject {
 		this.preserveHost = preserveHost;
 	}
 
-	@JsonProperty("target_url")
+	@JsonProperty("upstream_url")
 	public String getTargetUrl() {
 		return targetUrl;
 	}
