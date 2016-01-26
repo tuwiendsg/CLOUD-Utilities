@@ -42,6 +42,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -51,6 +55,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 @SpringBootApplication
+@RestController
 public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 
 	private static Logger logger = LoggerFactory.getLogger(RegistryService.class);
@@ -149,5 +154,15 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 
 	public Discovery getDiscovery() {
 		return this.discovery;
+	}
+	
+	@RequestMapping("/")
+	public String greeting() {
+		return "Welcome to the Gateway Regestry Service!";
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/check")
+	public boolean greeting(@RequestBody String name) {
+		return name.equals("Sveti");
 	}
 }
