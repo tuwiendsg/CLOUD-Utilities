@@ -42,6 +42,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -63,6 +64,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private ExecutorService executorService;
 	private List<Shutdownable> shutdownables;
 	private List<AListener> listeners;
+	private List<String> allowedUsers;
 
 	@Autowired
 	private KongSettings kongSettings;
@@ -70,6 +72,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private DiscoverySettings discoverySettings;
 
 	public RegistryService() {
+		allowedUsers = new ArrayList<>();
 	}
 
 	@PostConstruct
@@ -163,6 +166,26 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/check")
 	public boolean greeting(@RequestBody String name) {
-		return name.equals("Sveti");
+		return this.allowedUsers.contains(name);
+	}
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "users/{user}")
+	public String register(@PathVariable String name) {
+		if(this.allowedUsers.contains(name)) {
+			return "User allready registered!";
+		}
+		
+		this.allowedUsers.add(name);
+		return String.format("User %s added successfully!", name);
+	}
+	
+	@RequestMapping(method = RequestMethod.DELETE, value = "users/{user}")
+	public String remove(@PathVariable String name) {
+		if(!this.allowedUsers.contains(name)) {
+			return "User not registered!";
+		}
+		
+		this.allowedUsers.remove(name);
+		return String.format("User %s removed successfully!", name);
 	}
 }
