@@ -169,23 +169,23 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		return this.allowedUsers.contains(name);
 	}
 	
-	@RequestMapping(method = RequestMethod.PUT, value = "users/{user}")
-	public String register(@PathVariable String name) {
-		if(this.allowedUsers.contains(name)) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/users/{user}")
+	public String register(@PathVariable String user) {
+		if(this.allowedUsers.contains(user)) {
 			return "User allready registered!";
 		}
 		
-		this.allowedUsers.add(name);
-		return String.format("User %s added successfully!", name);
+		this.allowedUsers.add(user);
+		return String.format("User %s added successfully!", user);
 	}
 	
-	@RequestMapping(method = RequestMethod.DELETE, value = "users/{user}")
-	public String remove(@PathVariable String name) {
-		if(!this.allowedUsers.contains(name)) {
+	@RequestMapping(method = RequestMethod.DELETE, value = "/users/{user}")
+	public String remove(@PathVariable String user) {
+		if(!this.allowedUsers.contains(user)) {
 			return "User not registered!";
 		}
 		
-		this.allowedUsers.remove(name);
-		return String.format("User %s removed successfully!", name);
+		this.allowedUsers.remove(user);
+		return String.format("User %s removed successfully!", user);
 	}
 }
