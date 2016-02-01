@@ -164,13 +164,8 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		return "Welcome to the Gateway Regestry Service!";
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/check")
-	public boolean greeting(@RequestBody String name) {
-		return this.allowedUsers.contains(name);
-	}
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/users/{user}/check")
-	public boolean check(@PathVariable String user) {
+	@RequestMapping(method = RequestMethod.POST, value = "/users/check")
+	public boolean check(@RequestBody String user) {
 		logger.info("User {} requested authentication check!", user);
 		if(this.allowedUsers.contains(user)) {
 			return true;
