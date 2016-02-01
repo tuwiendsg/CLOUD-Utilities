@@ -7,8 +7,16 @@ function RestDecisionHandler:new()
 end
 
 function RestDecisionHandler:access(conf)
+
+	local consumer_id
+	if ngx.ctx.authenticated_credential then
+		consumer_id = ngx.ctx.authenticated_credential.consumer_id
+	else
+		return responses.send_HTTP_FORBIDDEN("Cannot identify the consumer, please do authenticate your request!")
+	end
+
 	RestDecisionHandler.super.access(self)
-	local res = access.request(conf, "sveti") == "true"
+	local res = access.request(conf, consumer_id) == "true"
 	if not res then
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end
