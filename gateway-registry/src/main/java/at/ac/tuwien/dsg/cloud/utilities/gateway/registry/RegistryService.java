@@ -171,6 +171,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/users/{user}/check")
 	public boolean check(@PathVariable String user) {
+		logger.info("User {} requested authentication check!", user);
 		if(this.allowedUsers.contains(user)) {
 			return true;
 		}
