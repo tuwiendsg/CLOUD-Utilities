@@ -21,6 +21,8 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.Shutdownable;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongURIs;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongUser;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.AListener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
@@ -64,10 +66,10 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private ExecutorService executorService;
 	private List<Shutdownable> shutdownables;
 	private List<AListener> listeners;
-	private List<String> allowedUsers;
+	private List<KongUser> allowedUsers;
 
 	@Autowired
-	private KongSettings kongSettings;
+	private KongURIs kongUris;
 	@Autowired
 	private DiscoverySettings discoverySettings;
 
@@ -101,14 +103,13 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		this.executorService.execute(task);
 	}
 
-	private String getUrlForKongApi() {
-		return String.format("http://%s:%d/%s/", kongSettings.getIp(), kongSettings.getPort(), "apis");
-	}
-
+//	private String getUrlForKongApi(String path) {
+//		return String.format("http://%s:%d/%s/", kongSettings.getIp(), kongSettings.getPort(), path);
+//	}
 	public void deleteApi(String id) {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.delete(this.getUrlForKongApi() + id);
+			restTemplate.delete(this.kongUris.getKongApiIdUri(id));
 		} catch (HttpClientErrorException ex) {
 		}
 	}
@@ -116,7 +117,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	public APIResponseObject registerApi(APIObject apiObject) {
 		try {
 			RequestEntity<APIObject> requestEntity = RequestEntity
-					.put(URI.create(this.getUrlForKongApi()))
+					.put(URI.create(this.kongUris.getKongApisUri()))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.ALL)
 					.body(apiObject);
@@ -131,7 +132,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 			String serverResp = e.getResponseBodyAsString();
 			logger.error(String.format("Exception from server! "
 					+ "Following body was responded %s", serverResp), e);
-			
+
 			APIResponseObject resp = new APIResponseObject();
 			resp.setError(true);
 			resp.setErrorMsg(serverResp);
@@ -158,39 +159,75 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	public Discovery getDiscovery() {
 		return this.discovery;
 	}
-	
+
 	@RequestMapping("/")
 	public String greeting() {
 		return "Welcome to the Gateway Regestry Service!";
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/users/check")
 	public boolean check(@RequestBody String user) {
 		logger.info("User {} requested authentication check!", user);
-		if(this.allowedUsers.contains(user)) {
-			return true;
-		}
-		
-		return false;
+		return this.allowedUsers.stream().anyMatch((u) -> u.getUserName().equals(user));
 	}
-	
+
+	private String simpleRestExchange(RequestEntity reg, ResponseEntity resp, Class respType) {
+		try {
+			RestTemplate restTemplate = new RestTemplate();
+			resp = restTemplate.exchange(reg, respType);
+		} catch (HttpStatusCodeException e) {
+			String serverResp = e.getResponseBodyAsString();
+			logger.error(String.format("Exception from server! "
+					+ "Following body was responded %s", serverResp), e);
+			return serverResp;
+		}
+
+		return "ok";
+	}
+
 	@RequestMapping(method = RequestMethod.PUT, value = "/users/{user}")
 	public String register(@PathVariable String user) {
-		if(this.allowedUsers.contains(user)) {
-			return "User allready registered!";
+
+		RequestEntity<String> request = RequestEntity
+				.post(URI.create(this.kongUris.getKongConsumersUri()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.ALL)
+				.body(String.format("username=%s", user));
+
+		ResponseEntity<KongUser> resp = null;
+		String ok = this.simpleRestExchange(request, resp, KongUser.class);
+
+		if (!ok.equals("ok")) {
+			return String.format("Could not register user due to %s", ok);
 		}
-		
-		this.allowedUsers.add(user);
+
+		this.allowedUsers.add(resp.getBody());
 		return String.format("User %s added successfully!", user);
 	}
-	
+
 	@RequestMapping(method = RequestMethod.DELETE, value = "/users/{user}")
 	public String remove(@PathVariable String user) {
-		if(!this.allowedUsers.contains(user)) {
-			return "User not registered!";
-		}
 		
-		this.allowedUsers.remove(user);
+		ResponseEntity<String> resp = null;
+		
+		this.allowedUsers.removeIf((u) -> {
+			if (u.getUserName().equals(user)) {
+				 RequestEntity<Void> request = RequestEntity
+						.delete(URI.create(this.kongUris.getKongConsumerIdUri(u.getId())))
+						.accept(MediaType.ALL)
+						.build();
+				 
+				 simpleRestExchange(request, resp, String.class);
+				
+				return true;
+			}
+			return false;
+		});
+
+		if (resp == null) {
+			return "User not found!";
+		}
+
 		return String.format("User %s removed successfully!", user);
 	}
 }
