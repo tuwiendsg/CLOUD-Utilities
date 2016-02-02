@@ -190,7 +190,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 
 		RequestEntity<String> request = RequestEntity
 				.post(URI.create(this.kongUris.getKongConsumersUri()))
-				.contentType(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.TEXT_PLAIN)
 				.accept(MediaType.ALL)
 				.body(String.format("username=%s", user));
 
