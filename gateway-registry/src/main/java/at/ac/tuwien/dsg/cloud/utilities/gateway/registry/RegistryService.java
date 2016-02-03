@@ -76,13 +76,15 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private DiscoverySettings discoverySettings;
 
 	public RegistryService() {
+		this.listeners = new ArrayList();
+		this.shutdownables = new ArrayList();
+		this.executorService = Executors.newCachedThreadPool();
+		
 	}
 
 	@PostConstruct
 	public void startup() {
 		logger.trace("Starting post construct.");
-		this.shutdownables = new ArrayList<Shutdownable>();
-		this.executorService = Executors.newCachedThreadPool();
 
 		RestDiscoveryServiceWrapper discovery
 				= new RestDiscoveryServiceWrapper(discoverySettings, this,
