@@ -1,0 +1,23 @@
+## Application properties for gateway registry
+---
+# IP + Port of Kong API
+kong:
+    ip: 127.0.0.1
+    port: 8001
+
+# IP + Port of Discovery + the name of the rabbitMqClusterService
+discovery:
+    ip: 127.0.0.2
+    port: 8580
+    serviceName: ManualTestRabbitService
+
+# Port on which the gateway registry will be available
+server:
+    port: 8280
+
+# Log levels
+logging:
+    level:
+        at:
+            ac:
+                tuwien: TRACE

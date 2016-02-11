@@ -1,0 +1,19 @@
+{
+	"data": [
+		{
+			"username": "test",
+			"created_at": 1454512299000,
+			"id": "79a85605-590e-44a7-c4f1-14fdf00b428d"
+		},
+		{
+			"username": "test1",
+			"created_at": 1454512299005,
+			"id": "79a85605-590e-44a7-c4f1-14fdf00b430e"
+		},
+		{
+			"username": "test2",
+			"created_at": 1454512299010,
+			"id": "79a85605-590e-44a7-c4f1-14fdf00b432f"
+		}
+	]
+}

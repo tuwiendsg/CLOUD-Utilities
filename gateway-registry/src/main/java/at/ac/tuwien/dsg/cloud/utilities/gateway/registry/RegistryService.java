@@ -68,7 +68,7 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private ExecutorService executorService;
 	private List<Shutdownable> shutdownables;
 	private List<AListener> listeners;
-	private KongUserList kongUsers;
+	
 
 	@Autowired
 	private KongURIs kongUris;
@@ -89,13 +89,6 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		RestDiscoveryServiceWrapper discovery
 				= new RestDiscoveryServiceWrapper(discoverySettings, this,
 						this.executorService);
-		
-		RequestEntity<Void> req = RequestEntity
-				.get(URI.create(this.kongUris.getKongConsumersUri()))
-				.build();
-		
-		ResponseEntity<KongUserList> resp = this.simpleRestExchange(req, KongUserList.class);
-		this.kongUsers = resp.getBody();
 		
 		this.shutdownables.add(discovery);
 	}
@@ -169,73 +162,5 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	@RequestMapping("/")
 	public String greeting() {
 		return "Welcome to the Gateway Regestry Service!";
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/users/check")
-	public boolean check(@RequestBody String user) {
-		logger.info("User {} requested authentication check!", user);
-		return this.kongUsers.getUsers().stream().anyMatch((u) -> u.getUserName().equals(user));
-	}
-
-	private <T> ResponseEntity<T> simpleRestExchange(RequestEntity reg, Class<T> respType) {
-		try {
-			RestTemplate restTemplate = new RestTemplate();
-			return restTemplate.exchange(reg, respType);
-		} catch (HttpStatusCodeException e) {
-			String serverResp = e.getResponseBodyAsString();
-			logger.error(String.format("Exception from server! "
-					+ "With status code %s! "
-					+ "Following body was responded %s",
-					e.getStatusCode().toString(),
-					serverResp), e);
-		}
-
-		return null;
-	}
-
-	@RequestMapping(method = RequestMethod.PUT, value = "/users/{user}")
-	public String register(@PathVariable String user) {
-
-		RequestEntity<String> request = RequestEntity
-				.post(URI.create(this.kongUris.getKongConsumersUri()))
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.ALL)
-				.body(String.format("{\"username\": \"%s\"}", user));
-
-		ResponseEntity<KongUser> resp = this.simpleRestExchange(request, KongUser.class);
-
-		if (resp == null || resp.getStatusCode() != HttpStatus.CREATED) {
-			return String.format("Could not register user! Check logs!");
-		}
-
-		this.kongUsers.getUsers().add(resp.getBody());
-		return String.format("User %s added successfully!", user);
-	}
-
-	@RequestMapping(method = RequestMethod.DELETE, value = "/users/{user}")
-	public String remove(@PathVariable String user) {
-		boolean res = this.kongUsers.getUsers().removeIf((KongUser u) -> {
-			if (u.getUserName().equals(user)) {
-				RequestEntity<Void> request = RequestEntity
-						.delete(URI.create(this.kongUris.getKongConsumerIdUri(u.getId())))
-						.accept(MediaType.ALL)
-						.build();
-
-				ResponseEntity<String> resp = simpleRestExchange(request, String.class);
-				
-				if(resp == null || resp.getStatusCode() != HttpStatus.NO_CONTENT) {
-					return false;
-				}
-				
-				return true;
-			}
-			return false;
-		});
-
-		if (!res) {
-			return "Could not delete user! Check logs!";
-		}
-
-		return String.format("User %s removed successfully!", user);
 	}
 }
