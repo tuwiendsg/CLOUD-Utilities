@@ -27,6 +27,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -58,17 +59,15 @@ public class DiscoveryRESTService extends ADiscovery implements Discovery {
 					.build();
 
 			HttpUriRequest request = new HttpGet(statusUri);
-			HttpClient client = new DefaultHttpClient();
+			HttpClient client = HttpClientBuilder.create().build();
 			HttpResponse resp = client.execute(request);
 			logger.trace("Got response: {}", resp.getStatusLine().getStatusCode());
+			
 			if (resp.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
 				return true;
 			}
-		} catch (IllegalStateException ex) {
-			if (!ex.getMessage().equals("Target host is null")) {
-				throw ex;
-			}
 		} catch (IOException ex) {
+			logger.warn("Exception in discovery check.", ex);
 		}
 
 		return false;
