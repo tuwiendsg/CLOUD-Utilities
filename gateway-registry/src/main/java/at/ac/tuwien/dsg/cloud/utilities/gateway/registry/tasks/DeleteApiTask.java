@@ -18,6 +18,7 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.KongService;
 
 /**
  *
@@ -25,13 +26,15 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
  */
 public class DeleteApiTask extends ATask<ChannelWrapper<APIResponseObject>> {
 
-	public DeleteApiTask(RegistryService service) {
-		super(service);
+	KongService service;
+	
+	public DeleteApiTask(KongService service) {
+		this.service = service;
 	}
 
 	@Override
 	public void run() {
-		this.registryService.deleteApi(this.wrapper.getBody().getId());
+		this.service.deleteApi(this.wrapper.getBody().getId());
 	}
 	
 }

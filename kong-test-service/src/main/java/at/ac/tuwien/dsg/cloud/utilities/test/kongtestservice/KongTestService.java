@@ -55,17 +55,7 @@ public class KongTestService {
 				//when there is no previous object created (null values)
 			this.adapterService.createApiAdapter()
 					.withName("ktsRoot")
-					.withPath("kts")
-					.doStripPath(true)
-					.withPublicDns(ip)
-					.withTargetUrl(String.format("http://%s:8080", ip))
-					.send();
-			
-			this.adapterService.createApiAdapter()
-					.withName("ktsRoot2")
-					.withPath("kts")
-					.doStripPath(true)
-					.withPublicDns(ip)
+					.withRestPath("kts")
 					.withTargetUrl(String.format("http://%s:8080", ip))
 					.send();
 		} catch (SocketException ex) {

@@ -22,11 +22,11 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongURIs;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongUser;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongUserList;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.AListener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.CachingDiscovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
@@ -37,19 +37,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -74,6 +71,10 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 	private KongURIs kongUris;
 	@Autowired
 	private DiscoverySettings discoverySettings;
+	@Autowired
+	private Provider<DeleteApiTask> deleteApiTaskProvider;
+	@Autowired
+	private Provider<RegisterApiTask> registerApiTaskProvider;
 
 	public RegistryService() {
 		this.listeners = new ArrayList();
@@ -105,39 +106,39 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		this.executorService.execute(task);
 	}
 
-	public void deleteApi(String id) {
-		try {
-			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.delete(this.kongUris.getKongApiIdUri(id));
-		} catch (HttpClientErrorException ex) {
-		}
-	}
-
-	public APIResponseObject registerApi(APIObject apiObject) {
-		try {
-			RequestEntity<APIObject> requestEntity = RequestEntity
-					.put(URI.create(this.kongUris.getKongApisUri()))
-					.contentType(MediaType.APPLICATION_JSON)
-					.accept(MediaType.ALL)
-					.body(apiObject);
-
-			RestTemplate restTemplate = new RestTemplate();
-			ResponseEntity<APIResponseObject> resp = restTemplate
-					.exchange(requestEntity, APIResponseObject.class);
-
-			logger.trace("Response from Kong: {}", resp.getBody());
-			return resp.getBody();
-		} catch (HttpStatusCodeException e) {
-			String serverResp = e.getResponseBodyAsString();
-			logger.error(String.format("Exception from server! "
-					+ "Following body was responded %s", serverResp), e);
-
-			APIResponseObject resp = new APIResponseObject();
-			resp.setError(true);
-			resp.setErrorMsg(serverResp);
-			return resp;
-		}
-	}
+//	public void deleteApi(String id) {
+//		try {
+//			RestTemplate restTemplate = new RestTemplate();
+//			restTemplate.delete(this.kongUris.getKongApiIdUri(id));
+//		} catch (HttpClientErrorException ex) {
+//		}
+//	}
+//
+//	public APIResponseObject registerApi(APIObject apiObject) {
+//		try {
+//			RequestEntity<APIObject> requestEntity = RequestEntity
+//					.put(URI.create(this.kongUris.getKongApisUri()))
+//					.contentType(MediaType.APPLICATION_JSON)
+//					.accept(MediaType.ALL)
+//					.body(apiObject);
+//
+//			RestTemplate restTemplate = new RestTemplate();
+//			ResponseEntity<APIResponseObject> resp = restTemplate
+//					.exchange(requestEntity, APIResponseObject.class);
+//
+//			logger.trace("Response from Kong: {}", resp.getBody());
+//			return resp.getBody();
+//		} catch (HttpStatusCodeException e) {
+//			String serverResp = e.getResponseBodyAsString();
+//			logger.error(String.format("Exception from server! "
+//					+ "Following body was responded %s", serverResp), e);
+//
+//			APIResponseObject resp = new APIResponseObject();
+//			resp.setError(true);
+//			resp.setErrorMsg(serverResp);
+//			return resp;
+//		}
+//	}
 
 	/**
 	 * @param args the command line arguments
@@ -151,8 +152,8 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		logger.trace("Discovery done.");
 		this.discovery = new CachingDiscovery(wrapper);
 		this.shutdownables.remove(wrapper);
-		this.listeners.add(new RegisterListener(this));
-		this.listeners.add(new DeleteListener(this));
+		this.listeners.add(new RegisterListener(this, registerApiTaskProvider));
+		this.listeners.add(new DeleteListener(this, deleteApiTaskProvider));
 	}
 
 	public Discovery getDiscovery() {

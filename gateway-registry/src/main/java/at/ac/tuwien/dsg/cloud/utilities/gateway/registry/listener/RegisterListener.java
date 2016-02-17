@@ -18,6 +18,7 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
+import javax.inject.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,8 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RegisterListener extends AListener<APIObject, RegisterApiTask> {
 	
 	@Autowired
-	public RegisterListener(RegistryService service) {
-		super(service, "registerApiChannel", RegisterApiTask.class);
+	public RegisterListener(RegistryService service, 
+			Provider<RegisterApiTask> taskProvider) {
+		super(service, "registerApiChannel", taskProvider);
 	}
 
 	@Override

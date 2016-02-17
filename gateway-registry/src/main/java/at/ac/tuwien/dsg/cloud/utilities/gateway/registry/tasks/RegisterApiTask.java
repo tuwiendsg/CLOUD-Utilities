@@ -18,7 +18,9 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.KongService;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongApiObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongApiResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
@@ -33,24 +35,28 @@ import org.slf4j.LoggerFactory;
 public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(RegisterApiTask.class);
 	
-	private Producer producer;
+	private final KongService kongService;
+	private final Producer producer;
 	
-	public RegisterApiTask(RegistryService service) {
-		super(service);
+	public RegisterApiTask(KongService service, Producer producer) {
+		this.kongService = service;
+		this.producer = producer;
 	}
 
 	@Override
 	public void run() {
 		try {
-			APIResponseObject resp = this.registryService.registerApi(this
-					.wrapper.getBody());
+			KongApiResponseObject resp = this.kongService
+					.registerApi(KongApiObject
+					.fromApiObject(this.wrapper.getBody()));
 			
 			ObjectMapper mapper = new ObjectMapper();
 			
-			Message  response = ComotMessagingFactory
+			Message response = ComotMessagingFactory
 					.getRabbitMqMessage()
 					.withType(this.wrapper.getResponseChannelName())
-					.setMessage(mapper.writeValueAsBytes(resp));
+					.setMessage(mapper
+							.writeValueAsBytes((APIResponseObject)resp));
 			
 			this.producer.sendMessage(response);
 		} catch (IOException ex) {
@@ -61,8 +67,5 @@ public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
 	@Override
 	public void setBody(ChannelWrapper<APIObject> object) {
 		super.setBody(object);
-		
-		this.producer = ComotMessagingFactory
-				.getRabbitMqProducer(this.registryService.getDiscovery());
 	}
 }

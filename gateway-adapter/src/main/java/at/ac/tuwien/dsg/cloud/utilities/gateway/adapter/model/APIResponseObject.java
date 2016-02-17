@@ -24,10 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class APIResponseObject {
 	private String id;
 	private String name;
-	private String publicDns;
-	private String targetUrl;
-	private boolean preserveHost;
-	private long createdAt;
 	private boolean error;
 	private String errorMsg;
 
@@ -45,42 +41,6 @@ public class APIResponseObject {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	@JsonProperty("request_host")
-	public String getPublicDns() {
-		return publicDns;
-	}
-
-	public void setPublicDns(String publicDns) {
-		this.publicDns = publicDns;
-	}
-
-	@JsonProperty("upstream_url")
-	public String getTargetUrl() {
-		return targetUrl;
-	}
-
-	public void setTargetUrl(String targetUrl) {
-		this.targetUrl = targetUrl;
-	}
-
-	@JsonProperty("preserve_host")
-	public boolean isPreserveHost() {
-		return preserveHost;
-	}
-
-	public void setPreserveHost(boolean preserverHost) {
-		this.preserveHost = preserveHost;
-	}
-
-	@JsonProperty("created_at")
-	public long getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(long createdAt) {
-		this.createdAt = createdAt;
 	}
 
 	public boolean isError() {

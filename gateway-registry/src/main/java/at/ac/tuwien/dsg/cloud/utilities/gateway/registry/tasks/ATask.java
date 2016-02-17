@@ -15,8 +15,6 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks;
 
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
-
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
@@ -24,11 +22,6 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 public abstract class ATask<T> implements Task<T> {
 
 	protected T wrapper;
-	protected RegistryService registryService;
-	
-	protected ATask(RegistryService service) {
-		this.registryService = service;
-	}
 	
 	@Override
 	public void setBody(T object) {

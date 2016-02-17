@@ -99,7 +99,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	public void send(APIObject api) throws NoDiscoveryException {
 		if(this.generatedChannelName == null) {
 			if(this.cachingMode) {
-				this.cachedAPIs.put(api.targetUrl, api);
+				this.cachedAPIs.put(api.getTargetUrl(), api);
 				return;
 			}
 			
@@ -174,7 +174,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 				logger.error("Server responded with error! Msg: {}", res.getErrorMsg());
 				return;
 			}
-			this.registeredAPIs.put(res.getTargetUrl(), res);
+			this.registeredAPIs.put(res.getName(), res);
 		} catch (IOException ex) {
 			logger.error("Failed to read message.", ex);
 		}

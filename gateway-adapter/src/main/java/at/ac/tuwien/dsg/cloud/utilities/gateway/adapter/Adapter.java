@@ -21,10 +21,7 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
  */
 public interface Adapter {	
 	Adapter withName(String name);
-	Adapter withPublicDns(String dns);
-	Adapter withPath(String path);
-	Adapter doStripPath(boolean stripPath);
-	Adapter doPreserveHost(boolean preserveHost);
+	Adapter withRestPath(String path);
 	Adapter withTargetUrl(String targetUrl);
 	void send() throws NoDiscoveryException;
 }

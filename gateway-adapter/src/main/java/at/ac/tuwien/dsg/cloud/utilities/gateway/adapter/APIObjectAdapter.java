@@ -33,33 +33,33 @@ public class APIObjectAdapter implements Adapter {
 
 	@Override
 	public Adapter withName(String name) {
-		this.object.setName(name);
+		this.object.setApiName(name);
 		return this;
 	}
 
-	@Override
-	public Adapter withPublicDns(String dns) {
-		this.object.setPublicDns(dns);
-		return this;
-	}
-
-	@Override
-	public Adapter withPath(String path) {
-		this.object.setPath(path);
-		return this;
-	}
-
-	@Override
-	public Adapter doStripPath(boolean stripPath) {
-		this.object.setStripPath(stripPath);
-		return this;
-	}
-
-	@Override
-	public Adapter doPreserveHost(boolean preserveHost) {
-		this.object.setPreserveHost(preserveHost);
-		return this;
-	}
+//	@Override
+//	public Adapter withPublicDns(String dns) {
+//		this.object.setPublicDns(dns);
+//		return this;
+//	}
+//
+//	@Override
+//	public Adapter withPath(String path) {
+//		this.object.setPath(path);
+//		return this;
+//	}
+//
+//	@Override
+//	public Adapter doStripPath(boolean stripPath) {
+//		this.object.setStripPath(stripPath);
+//		return this;
+//	}
+//
+//	@Override
+//	public Adapter doPreserveHost(boolean preserveHost) {
+//		this.object.setPreserveHost(preserveHost);
+//		return this;
+//	}
 
 	@Override
 	public Adapter withTargetUrl(String targetUrl) {
@@ -74,5 +74,11 @@ public class APIObjectAdapter implements Adapter {
 	
 	public void delete() {
 		this.adapterService.delete(this.object.getTargetUrl());
+	}
+
+	@Override
+	public Adapter withRestPath(String path) {
+		this.object.setRestPath(path);
+		return this;
 	}
 }

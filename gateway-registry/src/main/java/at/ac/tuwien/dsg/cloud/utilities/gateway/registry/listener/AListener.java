@@ -25,25 +25,28 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFact
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import javax.inject.Provider;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
+ * @param <O>
+ * @param <T>
  */
-public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements MessageReceivedListener {
+public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> 
+		implements MessageReceivedListener {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AListener.class);
 	
 	protected RegistryService registryService;
-	private Consumer consumer;
-	private Class<T> taskClazz;
-	private Serializer<ChannelWrapper> serializer;
+	private final Consumer consumer;
+	private final Serializer<ChannelWrapper> serializer;
+	private final Provider<T> taskProvider;
 	
 	protected AListener(RegistryService service, String channelName, 
-			Class<T> taskClazz) {
+			Provider<T> taskProvider) {
 		
-		this.serializer = new JacksonSerializer<ChannelWrapper>(ChannelWrapper.class);
+		this.serializer = new JacksonSerializer<>(ChannelWrapper.class);
 		
 		this.consumer = ComotMessagingFactory
 				.getRabbitMqConsumer(service.getDiscovery())
@@ -51,7 +54,7 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 				.withType(channelName);
 		
 		this.registryService = service;
-		this.taskClazz = taskClazz;
+		this.taskProvider = taskProvider;
 	}
 	
 	protected abstract Class<O> getInnerClass();
@@ -59,18 +62,14 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>> implements
 	@Override
 	public void messageReceived(Message message) {
 		try {			
-			ChannelWrapper<O> object = serializer.withInnerType(getInnerClass()).deserilize(message.getMessage());
-			T task = taskClazz.getConstructor(RegistryService.class)
-					.newInstance(this.registryService);
+			ChannelWrapper<O> object = serializer
+					.withInnerType(getInnerClass())
+					.deserilize(message.getMessage());
+			//T task = this.get();
+			T task = this.taskProvider.get();
 			task.setBody(object);
 			this.registryService.execute(task);
-		} catch (IOException 
-				| NoSuchMethodException 
-				| SecurityException 
-				| InstantiationException 
-				| IllegalAccessException 
-				| IllegalArgumentException 
-				| InvocationTargetException ex) {
+		} catch (IOException | IllegalArgumentException ex) {
 			logger.error("Unexpected error!", ex);
 		}
 	}

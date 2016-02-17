@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
 
 /**
  *
@@ -31,43 +32,47 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = UserController.REST_CONTROLLER_PATH)
 public class UserController {
-	
+
 	public static final String REST_CONTROLLER_PATH = "/users";
 	public static final String REST_CHECK_PATH = "/check";
 	public static final String REST_USER_PATH_VARIABLE = "/{user}";
-	
+
 	private static Logger logger = LoggerFactory.getLogger(UserController.class);
 	private KongUserList kongUsers;
-	
+
 	private KongURIs kongUris;
 	private RestUtilities restUtilities;
-	
+
 	@Autowired
 	public UserController(KongURIs kongURIs, RestUtilities restUtilities) {
 		this.kongUris = kongURIs;
 		this.restUtilities = restUtilities;
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		RequestEntity<Void> req = RequestEntity
 				.get(URI.create(this.kongUris.getKongConsumersUri()))
 				.build();
-		
-		ResponseEntity<KongUserList> resp = restUtilities
-				.simpleRestExchange(req, KongUserList.class);
-		this.kongUsers = resp.getBody();
+
+		try {
+			ResponseEntity<KongUserList> resp = restUtilities
+					.simpleRestExchange(req, KongUserList.class);
+			this.kongUsers = resp.getBody();
+		} catch (ResourceAccessException ex) {
+			this.kongUsers = new KongUserList();
+		}
 	}
-	
-	@RequestMapping(method = RequestMethod.POST, 
+
+	@RequestMapping(method = RequestMethod.POST,
 			value = REST_CHECK_PATH)
 	public boolean check(@RequestBody String user) {
 		logger.info("User {} requested authentication check!", user);
-		return this.kongUsers.getUsers().stream().anyMatch((u) 
+		return this.kongUsers.getUsers().stream().anyMatch((u)
 				-> u.getUserName().equals(user));
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, 
+	@RequestMapping(method = RequestMethod.PUT,
 			value = REST_USER_PATH_VARIABLE)
 	public ResponseEntity<String> register(@PathVariable String user) {
 
@@ -87,7 +92,7 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, 
+	@RequestMapping(method = RequestMethod.DELETE,
 			value = REST_USER_PATH_VARIABLE)
 	public ResponseEntity<String> remove(@PathVariable String user) {
 		boolean res = this.kongUsers.getUsers().removeIf((KongUser u) -> {

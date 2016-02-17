@@ -18,6 +18,7 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
+import javax.inject.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,13 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DeleteListener extends AListener<APIResponseObject, DeleteApiTask>{
 
 	@Autowired
-	public DeleteListener(RegistryService service) {
-		super(service, "deleteApi", DeleteApiTask.class);
+	public DeleteListener(RegistryService service, 
+			Provider<DeleteApiTask> taskProvider) {
+		super(service, "deleteApi", taskProvider);
 	}
 
 	@Override
 	protected Class<APIResponseObject> getInnerClass() {
 		return APIResponseObject.class;
-	}
-	
+	}	
 }
