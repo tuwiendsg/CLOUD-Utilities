@@ -17,8 +17,13 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.ChannelException;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.SendingChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +36,7 @@ public class RabbitMqProducer implements Producer {
 	private static Logger logger = LoggerFactory.getLogger(RabbitMqProducer.class);
 
 	private SendingChannel channel;
-	
+
 	public RabbitMqProducer(SendingChannel channel) {
 		this.channel = channel;
 	}
@@ -43,12 +48,12 @@ public class RabbitMqProducer implements Producer {
 		}
 
 		RabbitMqMessage msg = (RabbitMqMessage) message;
-		
-		logger.trace("Sending following message: {}", new String(msg.getMessage(), StandardCharsets.UTF_8));
 
-		msg.getTypes().stream().forEach(type -> {
+		logger.trace("Sending following message: {}",
+				new String(msg.getMessage(), StandardCharsets.UTF_8));
+
+		for (String type : message.getTypes()) {
 			this.channel.sendMessage(type, msg);
-		});
+		}
 	}
-
 }

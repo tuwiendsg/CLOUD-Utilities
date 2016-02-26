@@ -22,9 +22,25 @@ import java.util.EventListener;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public interface MessageReceivedListener extends EventListener {
+	
+	public static String defaultType = "default";
+	
 	/**
 	 * Gets fired when a message has been received by the consumer.
 	 * @param message - The received message.
 	 */
 	void messageReceived(Message message);
+	
+	/**
+	 * This specifies the type of messages this listener is interested in.
+	 * 
+	 * If not defined the listener will use a default type. Please note that
+	 * it is not guaranteed that the default type will be notified only
+	 * once per message.
+	 * 
+	 * @return 
+	 */
+	default String getType() {
+		return defaultType;
+	}
 }

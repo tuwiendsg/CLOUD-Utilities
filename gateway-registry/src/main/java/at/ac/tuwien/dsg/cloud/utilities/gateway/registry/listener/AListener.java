@@ -21,10 +21,9 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 import javax.inject.Provider;
 import org.slf4j.LoggerFactory;
 
@@ -38,22 +37,16 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>>
 		implements MessageReceivedListener {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AListener.class);
 	
-	protected RegistryService registryService;
-	private final Consumer consumer;
-	private final Serializer<ChannelWrapper> serializer;
+	private final ExecutorService executorService;
+	private final Serializer serializer;
 	private final Provider<T> taskProvider;
 	
-	protected AListener(RegistryService service, String channelName, 
-			Provider<T> taskProvider) {
+	protected AListener(ExecutorService service, 
+			Provider<T> taskProvider, 
+			Serializer serializer) {
 		
-		this.serializer = new JacksonSerializer<>(ChannelWrapper.class);
-		
-		this.consumer = ComotMessagingFactory
-				.getRabbitMqConsumer(service.getDiscovery())
-				.addMessageReceivedListener(this)
-				.withType(channelName);
-		
-		this.registryService = service;
+		this.serializer = serializer;
+		this.executorService = service;
 		this.taskProvider = taskProvider;
 	}
 	
@@ -63,12 +56,11 @@ public abstract class AListener<O, T extends Task<ChannelWrapper<O>>>
 	public void messageReceived(Message message) {
 		try {			
 			ChannelWrapper<O> object = serializer
-					.withInnerType(getInnerClass())
-					.deserilize(message.getMessage());
-			//T task = this.get();
+					.deserilize(message.getMessage(), ChannelWrapper.class,
+							getInnerClass());
 			T task = this.taskProvider.get();
 			task.setBody(object);
-			this.registryService.execute(task);
+			this.executorService.execute(task);
 		} catch (IOException | IllegalArgumentException ex) {
 			logger.error("Unexpected error!", ex);
 		}

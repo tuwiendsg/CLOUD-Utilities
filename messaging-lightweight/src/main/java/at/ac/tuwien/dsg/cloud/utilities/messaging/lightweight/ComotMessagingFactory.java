@@ -15,30 +15,53 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight;
 
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.CachingProducer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.RestServiceDiscovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqConsumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqFactory;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqProducer;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.SendingChannel;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
-
-
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class ComotMessagingFactory {
+
 	public static RabbitMqConsumer getRabbitMqConsumer(Discovery discovery) {
-		return new RabbitMqConsumer(new ReceivingChannel(discovery, new JacksonSerializer(RabbitMqMessage.class)));
+		Serializer serializer = ComotMessagingHelperFactory
+				.getJacksonSerializer();
+		RabbitMqFactory rabbitMqFactory = ComotMessagingHelperFactory
+				.getRabbitMqFactory();
+
+		return new RabbitMqConsumer(ComotMessagingHelperFactory
+				.getReceivingChannel(discovery, serializer, rabbitMqFactory));
 	}
-	
+
 	public static RabbitMqProducer getRabbitMqProducer(Discovery discovery) {
-		return new RabbitMqProducer(new SendingChannel(discovery, new JacksonSerializer(RabbitMqMessage.class)));
+		Serializer serializer = ComotMessagingHelperFactory
+				.getJacksonSerializer();
+		RabbitMqFactory rabbitMqFactory = ComotMessagingHelperFactory
+				.getRabbitMqFactory();
+
+		return new RabbitMqProducer(ComotMessagingHelperFactory
+				.getSendingChannel(discovery, serializer, rabbitMqFactory));
 	}
-	
+
+	public static CachingProducer getCachingRabbitMqProducer(Discovery discovery) {
+		return new MapCachingProducer(
+				ComotMessagingFactory.getRabbitMqProducer(discovery));
+	}
+
 	public static RabbitMqMessage getRabbitMqMessage() {
 		return new RabbitMqMessage();
+	}
+
+	public static Discovery getRestServiceDiscovery(DiscoverySettings settings) {
+		return new RestServiceDiscovery(settings,
+				ComotMessagingHelperFactory.getJacksonSerializer());
 	}
 }

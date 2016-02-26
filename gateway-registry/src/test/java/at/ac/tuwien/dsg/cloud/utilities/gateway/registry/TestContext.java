@@ -5,6 +5,7 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.KongSettings;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongURIs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;

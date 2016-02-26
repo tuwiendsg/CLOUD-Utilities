@@ -18,6 +18,9 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
+import java.util.concurrent.ExecutorService;
 import javax.inject.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,16 +28,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class RegisterListener extends AListener<APIObject, RegisterApiTask> {
-	
+public class RegisterListener extends AListener<APIObject, RegisterApiTask> {	
 	@Autowired
-	public RegisterListener(RegistryService service, 
-			Provider<RegisterApiTask> taskProvider) {
-		super(service, "registerApiChannel", taskProvider);
+	public RegisterListener(ExecutorService service, 
+			Provider<RegisterApiTask> taskProvider,
+			Serializer serializer) {
+		super(service, taskProvider, serializer);
 	}
 
 	@Override
 	protected Class<APIObject> getInnerClass() {
 		return APIObject.class;
+	}
+
+	@Override
+	public String getType() {
+		return "registerApiChannel";
 	}
 }

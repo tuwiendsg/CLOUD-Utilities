@@ -18,6 +18,9 @@ package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
+import java.util.concurrent.ExecutorService;
 import javax.inject.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,16 +28,24 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class DeleteListener extends AListener<APIResponseObject, DeleteApiTask>{
+public class DeleteListener extends AListener<APIResponseObject, DeleteApiTask> {
 
+	public static final String CHANNEL_TYPE = "deleteApi";
+	
 	@Autowired
-	public DeleteListener(RegistryService service, 
-			Provider<DeleteApiTask> taskProvider) {
-		super(service, "deleteApi", taskProvider);
+	public DeleteListener(ExecutorService service, 
+			Provider<DeleteApiTask> taskProvider,
+			Serializer serializer) {
+		super(service, taskProvider, serializer);
 	}
 
 	@Override
 	protected Class<APIResponseObject> getInnerClass() {
 		return APIResponseObject.class;
 	}	
+
+	@Override
+	public String getType() {
+		return CHANNEL_TYPE;
+	}
 }

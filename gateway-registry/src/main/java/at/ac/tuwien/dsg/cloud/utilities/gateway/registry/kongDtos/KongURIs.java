@@ -5,7 +5,7 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos;
 
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.KongSettings;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.KongSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

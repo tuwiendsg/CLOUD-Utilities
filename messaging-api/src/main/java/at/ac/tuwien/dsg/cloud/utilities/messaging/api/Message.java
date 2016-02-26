@@ -47,4 +47,8 @@ public interface Message {
 	Message withType(String type);
 	
 	List<String> getTypes();
+	
+	String getMessageKey();
+	
+	Message withMessageKey(String key);
 }

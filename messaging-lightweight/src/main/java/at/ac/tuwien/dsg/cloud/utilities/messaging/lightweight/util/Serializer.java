@@ -21,8 +21,9 @@ import java.io.IOException;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public interface Serializer<T> {
-	byte[] serialze(T object) throws IOException;
-	T deserilize(byte[] bytes) throws IOException;
-	Serializer<T> withInnerType(Class innerType);
+public interface Serializer {
+	<T> byte[] serialze(T object) throws IOException;
+	<T> T deserilize(byte[] bytes, Class<T> clazz) throws IOException;
+	<T> T deserilize(byte[] bytes, Class<T> clazz, Class innerType) 
+			throws IOException;
 }

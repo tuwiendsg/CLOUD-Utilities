@@ -21,9 +21,12 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel.ReceivingChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,16 +34,19 @@ import org.slf4j.LoggerFactory;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class RabbitMqConsumer implements Consumer, Runnable {	
+public class RabbitMqConsumer implements Consumer, Runnable {
+
 	private static Logger logger = LoggerFactory.getLogger(RabbitMqConsumer.class);
-	private List<MessageReceivedListener> messageListeners;
+	private HashMap<String, List<MessageReceivedListener>> messageListeners;
 	private ExecutorService threadPool;
 	private ReceivingChannel channel;
+	private Queue<String> messageFifo;
 
 	public RabbitMqConsumer(ReceivingChannel channel) {
-		this.messageListeners = new ArrayList<>();
+		this.messageListeners = new HashMap<>();
 		this.threadPool = Executors.newFixedThreadPool(1);
 		this.channel = channel;
+		this.messageFifo = new CircularFifoQueue<>(100);
 	}
 
 	@Override
@@ -53,39 +59,92 @@ public class RabbitMqConsumer implements Consumer, Runnable {
 	@Override
 	public Message getMessage() {
 		Message msg = this.channel.getDelivery();
-		logger.trace("Received following message: {}", new String(msg.getMessage(), StandardCharsets.UTF_8));
+		logger.trace("Received following message: {}",
+				new String(msg.getMessage(), StandardCharsets.UTF_8));
 		return msg;
 	}
 
 	@Override
-	public synchronized RabbitMqConsumer addMessageReceivedListener(MessageReceivedListener listener) {
-		this.messageListeners.add(listener);
+	public RabbitMqConsumer addMessageReceivedListener(
+			MessageReceivedListener listener) {
+		List<MessageReceivedListener> list = null;
 
-		if (this.messageListeners.size() == 1) {
-			this.threadPool.execute(this);
+		synchronized (this.messageListeners) {
+			if (this.messageListeners.containsKey(listener.getType())) {
+				list = this.messageListeners.get(listener.getType());
+			} else {
+				list = new ArrayList<>();
+				this.messageListeners.put(listener.getType(), list);
+			}
+
+			if (this.messageListeners.size() == 1) {
+				this.threadPool.execute(this);
+			}
 		}
-		
+
+		synchronized (list) {
+			list.add(listener);
+		}
+
 		return this;
 	}
 
 	@Override
-	public synchronized RabbitMqConsumer removeMessageReceivedListener(MessageReceivedListener listener) {
-		this.messageListeners.remove(listener);
+	public RabbitMqConsumer removeMessageReceivedListener(
+			MessageReceivedListener listener) {
+		synchronized (this.messageListeners) {
+			if (!this.messageListeners.containsKey(listener.getType())) {
+				return this;
+			}
+
+			List<MessageReceivedListener> list
+					= this.messageListeners.get(listener.getType());
+			
+			synchronized (list) {
+				list.remove(listener);
+			}
+			
+			if (list.isEmpty()) {
+				this.messageListeners.remove(listener.getType());
+			}
+		}
 		return this;
 	}
 
-	private synchronized void fireMessageReceived(Message msg) {
-		this.messageListeners.stream().forEach(listener -> {
-			listener.messageReceived(msg);
-		});
+	private void fireForType(String type, Message msg) {
+		List<MessageReceivedListener> list = null;
+		synchronized (this.messageListeners) {
+			list = this.messageListeners.get(type);
+		}
+
+		if (list != null) {
+			synchronized (list) {
+				list.forEach(listener -> {
+					listener.messageReceived(msg);
+				});
+			}
+		}
+	}
+
+	private void fireMessageReceived(Message msg) {
+		for (String type : msg.getTypes()) {
+			this.fireForType(type, msg);
+		}
+
+		this.fireForType(MessageReceivedListener.defaultType, msg);
 	}
 
 	@Override
 	public void run() {
 		while (!this.messageListeners.isEmpty()) {
 			Message msg = this.getMessage();
-
+			
+			if(this.messageFifo.contains(msg.getMessageKey())) {
+				msg = null;
+			}
+			
 			if (msg != null) {
+				this.messageFifo.add(msg.getMessageKey());
 				this.fireMessageReceived(msg);
 			}
 		}

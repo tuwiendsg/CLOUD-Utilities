@@ -16,15 +16,16 @@
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqConsumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqFactory;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,52 +34,91 @@ import org.slf4j.LoggerFactory;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class ReceivingChannel extends ARabbitChannel {
-	
-	private static Logger logger = LoggerFactory.getLogger(RabbitMqConsumer.class);
+
+	private static Logger logger = LoggerFactory.getLogger(ReceivingChannel.class);
 
 	private String queueName;
 	private QueueingConsumer consumer;
-	
-	public ReceivingChannel(Discovery discovery, Serializer<RabbitMqMessage> serializer) {
-		super(discovery, serializer);
-		this.serializer = serializer;
+	private List<String> types;
+
+	public ReceivingChannel(Discovery discovery,
+			Serializer serializer,
+			RabbitMqFactory rabbitMqFactory) {
+		super(discovery, serializer, rabbitMqFactory);
+		this.types = new ArrayList<>();
+	}
+
+	private void reconnect() {
+		if (shutdown.get()) {
+			return;
+		}
+
 		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException ex) {
+			return;
+		}
+
+		this.queueName = null;
+		try {
+			Channel channel = this.getChannel();
 			this.queueName = channel.queueDeclare().getQueue();
-			this.consumer = new QueueingConsumer(channel);
+			this.consumer = this.rabbitMqFactory.getQueueingConsumer(channel);
 			channel.basicConsume(queueName, true, consumer);
+			
+			for (String type : types) {
+				this.internalBindType(type);
+			}
+		} catch (ChannelException 
+				| IOException
+				| IllegalStateException ex) {
+			this.reconnect();
+		}
+	}
+	
+	private void internalBindType(String type) throws IllegalStateException {
+		try {
+			this.consumer.getChannel().queueBind(queueName,
+					ARabbitChannel.EXCHANGE_NAME, type);
 		} catch (IOException ex) {
 			throw new IllegalStateException(ex);
 		}
 	}
 
 	public void bindType(String type) throws IllegalStateException {
-		try {
-			channel.queueBind(queueName, ARabbitChannel.EXCHANGE_NAME, type);
-		} catch (IOException ex) {
-			throw new IllegalStateException(ex);
+		this.types.add(type);
+
+		if (this.queueName == null) {
+			return;
 		}
+
+		this.internalBindType(type);
 	}
 
 	public RabbitMqMessage getDelivery() {
-		ObjectInputStream in = null;
-		try {
-			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			return this.serializer.deserilize(delivery.getBody());
-		} catch (IOException | 
-				InterruptedException | 
-				ShutdownSignalException | 
-				ConsumerCancelledException ex) {
-			logger.error("Error while receiving message!", ex);
-		} finally {
-			try {
-				if (in != null) {
-					in.close();
-				}
-			} catch (IOException ex) {
-				logger.error("Error while trying to close stream!", ex);
-			}
+		if (this.shutdown.get()) {
+			return null;
+		}
+		
+		//this ensures that we start listening for incoming messages
+		//when there is really someone who is interested in listening
+		//this way we ensure a lazy startup
+		if(this.queueName == null) {
+			this.reconnect();
 		}
 
-		return null;
+		try {
+			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+			return this.serializer.deserilize(delivery.getBody(), 
+					RabbitMqMessage.class);
+		} catch (IOException |
+				InterruptedException |
+				ShutdownSignalException |
+				ConsumerCancelledException ex) {
+			logger.warn("Error while receiving message!", ex);
+			this.reconnect();
+		}
+
+		return this.getDelivery();
 	}
 }

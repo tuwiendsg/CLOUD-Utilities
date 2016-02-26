@@ -16,22 +16,27 @@
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class CachingDiscovery extends ADiscovery implements Discovery {
+public class CachingDiscovery implements Runnable {
 
-	private String host;
+	private Discovery discovery;
+	private ExecutorService executorService;
 	
 	public CachingDiscovery(Discovery discovery) {
-		this.setBackup(discovery);
+		this.discovery = this.discovery;
+		this.executorService = Executors.newFixedThreadPool(1);
+		this.executorService.execute(this);
 	}
-	
+
 	@Override
-	public String discoverHost() {
-		host = this.discoverHost(host);
-		return host;
-	}	
+	public void run() {
+		
+	}
 }

@@ -13,36 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
 
 /**
- * 
+ *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-@Component
-public class KongSettings {
-	@Value("${kong.ip}")
-	private String ip;
-	@Value("${kong.port}")
-	private int port;
-	
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
+public interface Shutdownable {
+	void shutdown();
 }

@@ -16,11 +16,11 @@
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.channel;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqFactory;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqMessage;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
-import java.io.ByteArrayOutputStream;
+import com.rabbitmq.client.Channel;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,28 +29,24 @@ import org.slf4j.LoggerFactory;
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class SendingChannel extends ARabbitChannel {
-	
 	private static Logger logger = LoggerFactory.getLogger(SendingChannel.class);
 	
-	public SendingChannel(Discovery discovery, Serializer<RabbitMqMessage> serializer) {
-		super(discovery, serializer);
+	public SendingChannel(Discovery discovery, 
+			Serializer serializer,
+			RabbitMqFactory rabbitMqFactory) {
+		super(discovery, serializer, rabbitMqFactory);
 	}
 
-	public void sendMessage(String type, RabbitMqMessage msg) {
-		ObjectOutputStream out = null;
+	public void sendMessage(String type, RabbitMqMessage msg) throws ChannelException {
 		try {
 			byte[] body = this.serializer.serialze(msg);
-			this.channel.basicPublish(ARabbitChannel.EXCHANGE_NAME, type, null, body);
+			Channel channel = this.getChannel();
+			channel.basicPublish(ARabbitChannel.EXCHANGE_NAME, type, null, body);
+			channel.close();
 		} catch (IOException ex) {
-			logger.error(String.format("Error while sending message with type %s!", type), ex);
-		} finally {
-			try {
-				if (out != null) {
-					out.close();
-				}
-			} catch (IOException ex) {
-				logger.error("Error while trying to close stream!", ex);
-			}
+			logger.error(String
+					.format("Error while sending message with type %s!", type)
+					, ex);
 		}
 	}
 }

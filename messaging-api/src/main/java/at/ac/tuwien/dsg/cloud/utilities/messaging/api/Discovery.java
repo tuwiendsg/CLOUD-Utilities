@@ -15,11 +15,12 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.messaging.api;
 
+import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryException;
+
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public interface Discovery {
-	String discoverHost();
-	void setBackup(Discovery backup);
+	String discoverHost() throws DiscoveryException;
 }

@@ -37,30 +37,6 @@ public class APIObjectAdapter implements Adapter {
 		return this;
 	}
 
-//	@Override
-//	public Adapter withPublicDns(String dns) {
-//		this.object.setPublicDns(dns);
-//		return this;
-//	}
-//
-//	@Override
-//	public Adapter withPath(String path) {
-//		this.object.setPath(path);
-//		return this;
-//	}
-//
-//	@Override
-//	public Adapter doStripPath(boolean stripPath) {
-//		this.object.setStripPath(stripPath);
-//		return this;
-//	}
-//
-//	@Override
-//	public Adapter doPreserveHost(boolean preserveHost) {
-//		this.object.setPreserveHost(preserveHost);
-//		return this;
-//	}
-
 	@Override
 	public Adapter withTargetUrl(String targetUrl) {
 		this.object.setTargetUrl(targetUrl);

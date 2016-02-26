@@ -15,122 +15,90 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.adapter;
 
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Shutdownable;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.CachingProducer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.MessageReceivedListener;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.inject.Provider;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class AdapterServiceImpl implements AdapterService, MessageReceivedListener, 
-		RestDiscoveryServiceWrapperCallback, Shutdownable {
+public class AdapterServiceImpl implements AdapterService, 
+		MessageReceivedListener,  
+		Shutdownable {
 	private static org.slf4j.Logger logger = LoggerFactory.getLogger(AdapterServiceImpl.class);
 	
-	private Producer producer;
+	private CachingProducer producer;
 	private Consumer consumer;
-
+	private Provider<Message> messageProvider;
 	private String generatedChannelName;
-	private RestDiscoveryServiceWrapper discovery;
-	
-	private boolean cachingMode;
-	private final ConcurrentHashMap<String, APIObject> cachedAPIs;
 	private final ConcurrentHashMap<String, APIResponseObject> registeredAPIs;
 	
-	private Serializer<ChannelWrapper> channelSerializer;
-	private Serializer<APIResponseObject> responseSerializer;
-
-	public AdapterServiceImpl(DiscoverySettings settings) {
-		this(settings, false);
-	}
+	private Serializer serializer;
 	
-	public AdapterServiceImpl(DiscoverySettings settings, boolean cachingMode) {
-		this.cachingMode = cachingMode;
+	public AdapterServiceImpl(CachingProducer producer,
+			Consumer consumer,
+			Serializer serializer,
+			Provider<Message> messageProvider) {
 		this.registeredAPIs = new ConcurrentHashMap<>();
-		this.cachedAPIs = new ConcurrentHashMap<>();
-		this.discovery = new RestDiscoveryServiceWrapper(settings, this);
-		this.channelSerializer = new JacksonSerializer<>(ChannelWrapper.class);
-		this.responseSerializer = new JacksonSerializer<>(APIResponseObject.class);
+		
+		//todo: now that the messaging light rabbit core has been
+		//rewriten think about this shit!
+		//should we still use a restDiscoveryServiceWrapper
+		//or is the functionality now given by the core?
+		//consider implementing general reconection legic directly
+		//into lightweight messaging ARabbitChannel
+		//-> maybe even as own service but most importantly in a common
+		//place and then get rid of all the startup blocking nonsence
+		//this.discovery = new RestDiscoveryServiceWrapper(settings, this);
+		this.producer = producer;
+		this.consumer = consumer;
+		this.serializer = serializer;
+		this.messageProvider = messageProvider;
+		this.generatedChannelName = UUID.randomUUID().toString();
+
+		this.consumer.withType(generatedChannelName)
+				.addMessageReceivedListener(this);
 	}
 	
-	@Override
-	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
-		this.producer = ComotMessagingFactory
-				.getRabbitMqProducer(discovery);
-
-		//todo: fix response idetifier generation
-		this.generatedChannelName = "generateTypeIdentifier";
-
-		this.consumer = ComotMessagingFactory
-				.getRabbitMqConsumer(discovery)
-				.withType(this.generatedChannelName)
-				.addMessageReceivedListener(this);
-		
-		if(this.cachingMode) {
-			this.cachedAPIs.values().stream().forEach(api -> {
-				try {
-					this.send(api);
-				} catch (NoDiscoveryException ex) {
-					//not possible
-				}
-			});
-			
-			this.cachedAPIs.clear();
-		}
-	}
-
 	@Override
 	public Adapter createApiAdapter() {
 		return new APIObjectAdapter(this);
 	}
 
 	@Override
-	public void send(APIObject api) throws NoDiscoveryException {
-		if(this.generatedChannelName == null) {
-			if(this.cachingMode) {
-				this.cachedAPIs.put(api.getTargetUrl(), api);
-				return;
-			}
-			
-			throw new NoDiscoveryException("A discovery service could not be "
-					+ "found.");
-		}
-				
+	public void send(APIObject api) throws NoDiscoveryException {	
 		try {
 			ChannelWrapper wrappedMsg = new ChannelWrapper<APIObject>();
 			wrappedMsg.setBody(api);
 			wrappedMsg.setResponseChannelName(this.generatedChannelName);
 
-			//todo: check object and throw exception if neccessary
-
-			Message message = ComotMessagingFactory
-					.getRabbitMqMessage()
+			Message message = this.messageProvider
+					.get()
 					.withType("registerApiChannel")
-					.setMessage(this.channelSerializer.serialze(wrappedMsg));
+					.withMessageKey(api.getTargetUrl())
+					.setMessage(this.serializer.serialze(wrappedMsg));
 
 			this.producer.sendMessage(message);
 		} catch (IOException ex) {
+			this.logger.error("Exception while trying to send API!", ex);
 		}
 	}
 
 	@Override
 	public void delete(String targetUrl) {
-		if(this.cachingMode) {
-			if(this.cachedAPIs.containsKey(targetUrl)) {
-				this.cachedAPIs.remove(targetUrl);
-			}
-		}
+		this.producer.removeMessageFromCache(targetUrl);
 		
 		if (this.registeredAPIs.containsKey(targetUrl)) {
 			APIResponseObject api = this.registeredAPIs.get(targetUrl);
@@ -141,12 +109,13 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 	private void deleteApi(APIResponseObject api) {
 		try {
-			ChannelWrapper<APIResponseObject> wrappedMsg = new ChannelWrapper<>();
+			ChannelWrapper<APIResponseObject> wrappedMsg = 
+					new ChannelWrapper<>();
 			wrappedMsg.setBody(api);
 
-			Message msg = ComotMessagingFactory
-					.getRabbitMqMessage()
-					.setMessage(this.channelSerializer.serialze(wrappedMsg))
+			Message msg = this.messageProvider
+					.get()
+					.setMessage(this.serializer.serialze(wrappedMsg))
 					.withType("deleteApi");
 
 			this.producer.sendMessage(msg);
@@ -157,10 +126,7 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 	@Override
 	public void unregisterAllApis() {
-		if(this.cachingMode) {
-			this.cachedAPIs.clear();
-		}
-		
+		this.producer.clearCache();
 		this.registeredAPIs.values().stream().forEach(api -> {
 			this.deleteApi(api);
 		});
@@ -169,9 +135,11 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 	@Override
 	public void messageReceived(Message message) {
 		try {
-			APIResponseObject res = this.responseSerializer.deserilize(message.getMessage());
+			APIResponseObject res = this.serializer
+					.deserilize(message.getMessage(), APIResponseObject.class);
 			if(res.isError()) {
-				logger.error("Server responded with error! Msg: {}", res.getErrorMsg());
+				logger.error("Server responded with error! Msg: {}", 
+						res.getErrorMsg());
 				return;
 			}
 			this.registeredAPIs.put(res.getName(), res);
@@ -182,7 +150,12 @@ public class AdapterServiceImpl implements AdapterService, MessageReceivedListen
 
 	@Override
 	public void shutdown() {
-		this.discovery.shutdown();
+		//this.discovery.shutdown();
+	}
+
+	@Override
+	public String getType() {
+		return this.generatedChannelName;
 	}
 
 	

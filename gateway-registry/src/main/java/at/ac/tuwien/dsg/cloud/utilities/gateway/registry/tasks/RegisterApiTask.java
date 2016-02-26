@@ -24,6 +24,7 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongApiRespons
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
 	
 	private final KongService kongService;
 	private final Producer producer;
+	//private final Serializer
 	
 	public RegisterApiTask(KongService service, Producer producer) {
 		this.kongService = service;

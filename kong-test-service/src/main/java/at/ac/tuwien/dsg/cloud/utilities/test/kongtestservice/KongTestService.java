@@ -7,6 +7,7 @@ package at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice;
 
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.AdapterServiceImpl;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.GatewayAdapterFactory;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.NoDiscoveryException;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import at.ac.tuwien.dsg.cloud.utilities.test.kongtestservice.utilities.NetworkService;
@@ -44,7 +45,8 @@ public class KongTestService {
 	
 	@PostConstruct
 	private void init() {
-		this.adapterService = new AdapterServiceImpl(discoverySettings, true);
+		this.adapterService = GatewayAdapterFactory
+				.adapterServiceImpl(discoverySettings);
 		
 		try {
 			String ip = NetworkService.getIp();

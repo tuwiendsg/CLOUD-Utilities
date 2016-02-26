@@ -15,11 +15,11 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight;
 
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
+//import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+//import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+//import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
+//import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
+//import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
 
 
 /**
@@ -28,32 +28,32 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
  */
 public class ComotMessagingService {
 	
-	private Discovery discovery;
-	private ServerCluster cluster;
-	
-	public ComotMessagingService(Discovery discovery) {
-		this.discovery = discovery;
-	}
-	
-	public ComotMessagingService(Discovery discovery, ServerCluster cluster) {
-		this.cluster = cluster;
-		this.cluster.deploy();
-		this.discovery = discovery;
-	}
-	
-	public ServerCluster getServerCluster() {
-		return this.cluster;
-	}
-	
-	public Message getRabbitMqMessage() {
-		return ComotMessagingFactory.getRabbitMqMessage();
-	}
-	
-	public Consumer getRabbitMqConsumer() {
-		return ComotMessagingFactory.getRabbitMqConsumer(discovery);
-	}
-	
-	public Producer getRabbitMqProducer() {
-		return ComotMessagingFactory.getRabbitMqProducer(discovery);
-	}	
+//	private Discovery discovery;
+//	private ServerCluster cluster;
+//	
+//	public ComotMessagingService(Discovery discovery) {
+//		this.discovery = discovery;
+//	}
+//	
+//	public ComotMessagingService(Discovery discovery, ServerCluster cluster) {
+//		this.cluster = cluster;
+//		this.cluster.deploy();
+//		this.discovery = discovery;
+//	}
+//	
+//	public ServerCluster getServerCluster() {
+//		return this.cluster;
+//	}
+//	
+//	public Message getRabbitMqMessage() {
+//		return ComotMessagingFactory.getRabbitMqMessage();
+//	}
+//	
+//	public Consumer getRabbitMqConsumer() {
+//		return ComotMessagingFactory.getRabbitMqConsumer(discovery);
+//	}
+//	
+//	public Producer getRabbitMqProducer() {
+//		return ComotMessagingFactory.getRabbitMqProducer(discovery);
+//	}	
 }

@@ -23,6 +23,6 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.discoveryHelper.DiscoveryRespo
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public interface DiscoveryService {
+	//todo: try to merge the discovery and discoveryService interfaces
 	DiscoveryResponse discover(DiscoveryRequest request);
-	boolean isDeployed();
 }

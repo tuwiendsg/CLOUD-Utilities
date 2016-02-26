@@ -15,42 +15,19 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
-import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapper;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.RestDiscoveryServiceWrapperCallback;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.Shutdownable;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.Task;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIResponseObject;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongURIs;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.AListener;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.CachingDiscovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
-import java.net.URI;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Shutdownable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -58,53 +35,60 @@ import org.springframework.web.client.RestTemplate;
  */
 @SpringBootApplication
 @RestController
-public class RegistryService implements RestDiscoveryServiceWrapperCallback {
+public class RegistryService implements ShutdownService {
 
 	private static Logger logger = LoggerFactory.getLogger(RegistryService.class);
-	private Discovery discovery;
-	private ExecutorService executorService;
-	private List<Shutdownable> shutdownables;
-	private List<AListener> listeners;
-	
 
-	@Autowired
-	private KongURIs kongUris;
-	@Autowired
-	private DiscoverySettings discoverySettings;
-	@Autowired
-	private Provider<DeleteApiTask> deleteApiTaskProvider;
-	@Autowired
-	private Provider<RegisterApiTask> registerApiTaskProvider;
+	private List<Shutdownable> shutdownables;
+	@Autowired(required = false)
+	private ServerCluster serverCluster;
+//	private List<AListener> listeners;
+
+//	@Autowired
+//	private Consumer consumer;
+
+//	@Autowired
+//	private KongURIs kongUris;
+//	@Autowired
+//	private DiscoverySettings discoverySettings;
+//	@Autowired
+//	private Provider<DeleteApiTask> deleteApiTaskProvider;
+//	@Autowired
+//	private Provider<RegisterApiTask> registerApiTaskProvider;
+//	@Autowired
+//	private DeleteListener deleteListener;
+//	@Autowired
+//	private RegisterListener registerListener;
+//	@Autowired
+//	private ExecutorService executorService;
 
 	public RegistryService() {
-		this.listeners = new ArrayList();
-		this.shutdownables = new ArrayList();
-		this.executorService = Executors.newCachedThreadPool();
-		
+//		this.listeners = new ArrayList();
+		this.shutdownables = new ArrayList<>();
 	}
 
 	@PostConstruct
 	public void startup() {
 		logger.trace("Starting post construct.");
-
-		RestDiscoveryServiceWrapper discovery
-				= new RestDiscoveryServiceWrapper(discoverySettings, this,
-						this.executorService);
 		
-		this.shutdownables.add(discovery);
+		//todo: this should go to the background!!!
+		if(serverCluster != null && !serverCluster.isDeployed()) {
+			serverCluster.deploy();
+		}
+//		this.registerListener(registerListener);
+//		this.registerListener(deleteListener);
+
+//		RestDiscoveryServiceWrapper discovery
+//				= new RestDiscoveryServiceWrapper(discoverySettings, this,
+//						this.executorService);
+//		this.shutdownables.add(discovery);
 	}
 
-	@PreDestroy
-	public void destroy() {
-		this.shutdownables.stream().forEach(s -> {
-			s.shutdown();
-		});
-		this.executorService.shutdown();
-	}
-
-	public void execute(Task task) {
-		this.executorService.execute(task);
-	}
+//	public void registerListener(AListener listener) {
+//		this.consumer
+//				.withType(listener.getType())
+//				.addMessageReceivedListener(listener);
+//	}
 
 //	public void deleteApi(String id) {
 //		try {
@@ -139,7 +123,6 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 //			return resp;
 //		}
 //	}
-
 	/**
 	 * @param args the command line arguments
 	 */
@@ -147,21 +130,36 @@ public class RegistryService implements RestDiscoveryServiceWrapperCallback {
 		SpringApplication.run(RegistryService.class, args);
 	}
 
-	@Override
-	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
-		logger.trace("Discovery done.");
-		this.discovery = new CachingDiscovery(wrapper);
-		this.shutdownables.remove(wrapper);
-		this.listeners.add(new RegisterListener(this, registerApiTaskProvider));
-		this.listeners.add(new DeleteListener(this, deleteApiTaskProvider));
-	}
-
-	public Discovery getDiscovery() {
-		return this.discovery;
-	}
-
+//	@Override
+//	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
+//		logger.trace("Discovery done.");
+//		//this.discovery = new CachingDiscovery(wrapper);
+//		this.shutdownables.remove(wrapper);
+//		this.listeners.add(new RegisterListener(this, registerApiTaskProvider));
+//		this.listeners.add(new DeleteListener(this, deleteApiTaskProvider));
+//	}
+//	public Discovery getDiscovery() {
+//		return this.discovery;
+//	}
 	@RequestMapping("/")
 	public String greeting() {
 		return "Welcome to the Gateway Regestry Service!";
+	}
+
+	@Override
+	public void registerService(Shutdownable service) {
+		synchronized(this.shutdownables) {
+			this.shutdownables.add(service);
+		}
+	}
+
+	@PreDestroy
+	@Override
+	public void shutdownAll() {
+		synchronized (this.shutdownables) {
+			this.shutdownables.stream().forEach(s -> {
+				s.shutdown();
+			});
+		}
 	}
 }

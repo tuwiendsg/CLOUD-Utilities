@@ -13,37 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery;
+package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings;
 
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- *
+ * 
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public abstract class ADiscovery implements Discovery {
+@Component
+public class KongSettings {
+	@Value("${kong.ip}")
+	private String ip;
+	@Value("${kong.port}")
+	private int port;
 	
-	protected static Logger logger = LoggerFactory.getLogger(ADiscovery.class);
-	
-	protected Discovery backup;
-	
-	protected String discoverHost(String host) {		
-		if(host == null && backup != null) {
-			return backup.discoverHost();
-		}
-		
-		if(logger != null) {
-			logger.trace("Discovered host: {}", host);
-		}
-		
-		return host;
+	public String getIp() {
+		return ip;
 	}
 
-	@Override
-	public void setBackup(Discovery backup) {
-		this.backup = backup;
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 }

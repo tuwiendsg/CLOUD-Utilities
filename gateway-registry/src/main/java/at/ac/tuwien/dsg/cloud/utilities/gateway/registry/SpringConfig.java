@@ -15,10 +15,30 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.SalsaSettings;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Shutdownable;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.RestServiceDiscovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
+import at.ac.tuwien.dsg.comot.messaging.rabbitMq.RabbitMQServerCluster;
+import at.ac.tuwien.dsg.comot.messaging.rabbitMq.ServerConfig;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.inject.Provider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
@@ -26,9 +46,92 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SpringConfig {
+	
+	@Autowired
+	private KongService kongService;
+	@Autowired
+	private RegistryService regestryService;
+	
+	@Autowired
+	public Provider<RegisterApiTask> registerApiTaskProvider;
+	@Autowired
+	public Provider<DeleteApiTask> deleteApiTaskProvider;
+	
+	
 	@ConfigurationProperties(prefix = "discovery")
 	@Bean
 	public DiscoverySettings discoverySettings() {
 		return new DiscoverySettings();
+	}
+	
+	@Bean
+	public Discovery restServiceDiscovery() {
+		return new RestServiceDiscovery(discoverySettings(), 
+				jacksonSerializer());
+	}
+	
+	@Bean
+	public Consumer consumer() {
+		//todo: check consumer for shutdown?!
+		Consumer bean = ComotMessagingFactory
+				.getRabbitMqConsumer(restServiceDiscovery());
+		bean.addMessageReceivedListener(registerListener());
+		bean.addMessageReceivedListener(deleteListener());
+		return bean;
+	}
+	
+	@Bean
+	public Serializer jacksonSerializer() {
+		return new JacksonSerializer();
+	}
+	
+	@Bean
+	@Scope("prototype")
+	public DeleteApiTask deleteApiTask() {
+		return new DeleteApiTask(kongService);
+	}
+	
+	@Bean
+	@Scope("prototype")
+	public RegisterApiTask registerApiTask() {
+		return new RegisterApiTask(kongService, 
+				ComotMessagingFactory
+						.getRabbitMqProducer(restServiceDiscovery()));
+	}
+	
+	@Bean
+	public RegisterListener registerListener() {
+		RegisterListener bean = new RegisterListener(executorService(), 
+				registerApiTaskProvider, jacksonSerializer());
+		return bean;
+	}
+	
+	@Bean
+	public DeleteListener deleteListener() {
+		DeleteListener bean = new DeleteListener(executorService(), 
+				deleteApiTaskProvider, jacksonSerializer());
+		return bean;
+	}
+	
+	@Bean
+	public ExecutorService executorService() {
+		ExecutorService bean = Executors.newCachedThreadPool();
+		regestryService.registerService(new Shutdownable() {
+			@Override
+			public void shutdown() {
+				bean.shutdown();
+			}
+		});
+		return bean;
+	}
+	
+	@Bean
+	public ServerConfig serverConfig() {
+		return new SalsaSettings();
+	}  
+	
+	@Bean
+	public ServerCluster getRabbitMqServerCluster() {
+		return new RabbitMQServerCluster(serverConfig());
 	}
 }

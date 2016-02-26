@@ -11,6 +11,12 @@ discovery:
     port: 8580
     serviceName: ManualTestRabbitService
 
+salsa:
+    ip: 128.130.172.215
+    port: 8080
+    serverCount: 1
+    serviceName: ManualTestRabbitService
+
 # Port on which the gateway registry will be available
 server:
     port: 8280

@@ -18,15 +18,22 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.UUID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * 
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class RabbitMqMessage extends TypeHandler<RabbitMqMessage> implements Message, Serializable {
+public class RabbitMqMessage extends TypeHandler<RabbitMqMessage> 
+		implements Message, Serializable {
 	
 	private byte[] content;
+	private String key;
+	
+	public RabbitMqMessage() {
+		this.key = UUID.randomUUID().toString();
+	}
 
 	@Override
 	public RabbitMqMessage setMessage(byte[] content) {
@@ -63,5 +70,16 @@ public class RabbitMqMessage extends TypeHandler<RabbitMqMessage> implements Mes
 		int hash = super.hashCode();
 		hash = 37 * hash + Arrays.hashCode(this.content);
 		return hash;
+	}
+
+	@Override
+	public String getMessageKey() {
+		return this.key;
+	}
+
+	@Override
+	public Message withMessageKey(String key) {
+		this.key = key;
+		return this;
 	}
 }

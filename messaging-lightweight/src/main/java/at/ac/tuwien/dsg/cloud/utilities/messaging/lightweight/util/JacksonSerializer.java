@@ -23,47 +23,33 @@ import java.io.IOException;
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-public class JacksonSerializer<T> implements Serializer<T> {
+public class JacksonSerializer implements Serializer {
 	
-	private ObjectMapper mapper;
-	private Class<T> clazz;
-	private JavaType javaType;
+	private final ObjectMapper mapper;
 	
-	public JacksonSerializer(Class<T> clazz) {
-		this.mapper = new ObjectMapper();
-		this.clazz = clazz;
+	public JacksonSerializer() {
+		mapper = new ObjectMapper();
 	}
 
 	@Override
-	public byte[] serialze(T object) throws IOException {
+	public <T> byte[] serialze(T object) throws IOException {
 		return mapper.writeValueAsBytes(object);
 	}
 
 	@Override
-	public T deserilize(byte[] bytes) throws IOException {
-		if(this.javaType != null) {
+	public <T> T deserilize(byte[] bytes, Class<T> clazz) throws IOException {
+		return this.deserilize(bytes, clazz, null);
+	}
+	
+	@Override
+	public <T> T deserilize(byte[] bytes, Class<T> clazz, Class innerType) 
+			throws IOException {
+		if(innerType != null) {
+			JavaType javaType = mapper.getTypeFactory()
+					.constructParametrizedType(clazz, clazz, innerType);
 			T res = mapper.readValue(bytes, javaType);
-			this.javaType = null;
 			return res;
 		}
 		return mapper.readValue(bytes, clazz);
 	}
-
-	/**
-	 * Some serializers need an inner type when de/serializing generalized objects.
-	 * 
-	 * This method provides you with the ability to set such an inner class once!
-	 * This means you have to set it before every call to de/serialize
-	 * when using it with generalized objects.
-	 * 
-	 * 
-	 * @param innerType
-	 * @return 
-	 */
-	@Override
-	public Serializer<T> withInnerType(Class innerType) {
-		this.javaType = mapper.getTypeFactory().constructParametrizedType(clazz, clazz, innerType);
-		return this;
-	}
-	
 }
