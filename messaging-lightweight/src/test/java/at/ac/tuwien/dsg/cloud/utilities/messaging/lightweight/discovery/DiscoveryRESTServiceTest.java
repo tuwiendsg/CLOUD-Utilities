@@ -36,10 +36,31 @@ public class DiscoveryRESTServiceTest {
 	
 	@Before
 	public void setUp() {
-		settings = new DiscoverySettings();
-		settings.setIp("127.0.0.1");
-		settings.setPort(8009);
-		settings.setServiceName("testRabbit");
+		settings = new DiscoverySettings() {
+			@Override
+			public String getIp() {
+				return "127.0.0.1";
+			}
+
+			@Override
+			public void setIp(String ip) {}
+
+			@Override
+			public int getPort() {
+				return 8009;
+			}
+
+			@Override
+			public void setPort(int port) {}
+
+			@Override
+			public String getServiceName() {
+				return "testRabbit";
+			}
+
+			@Override
+			public void setServiceName(String serviceName) {}
+		};
 		
 		discovery = new WireMockServer(settings.getPort());
 		discovery.start();

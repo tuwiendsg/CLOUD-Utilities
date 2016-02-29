@@ -40,8 +40,6 @@ public class RegistryService implements ShutdownService {
 	private static Logger logger = LoggerFactory.getLogger(RegistryService.class);
 
 	private List<Shutdownable> shutdownables;
-	@Autowired(required = false)
-	private ServerCluster serverCluster;
 //	private List<AListener> listeners;
 
 //	@Autowired
@@ -71,10 +69,6 @@ public class RegistryService implements ShutdownService {
 	public void startup() {
 		logger.trace("Starting post construct.");
 		
-		//todo: this should go to the background!!!
-		if(serverCluster != null && !serverCluster.isDeployed()) {
-			serverCluster.deploy();
-		}
 //		this.registerListener(registerListener);
 //		this.registerListener(deleteListener);
 

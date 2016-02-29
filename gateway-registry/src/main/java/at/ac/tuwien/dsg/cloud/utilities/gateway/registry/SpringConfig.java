@@ -29,8 +29,9 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.RestServ
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.RabbitMQServerCluster;
-import at.ac.tuwien.dsg.comot.messaging.rabbitMq.ServerConfig;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.serverCluster.RabbitMQServerCluster;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.serverCluster.ServerConfig;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.inject.Provider;
@@ -56,7 +57,6 @@ public class SpringConfig {
 	public Provider<RegisterApiTask> registerApiTaskProvider;
 	@Autowired
 	public Provider<DeleteApiTask> deleteApiTaskProvider;
-	
 	
 	@ConfigurationProperties(prefix = "discovery")
 	@Bean
@@ -125,13 +125,19 @@ public class SpringConfig {
 		return bean;
 	}
 	
+	@ConfigurationProperties(prefix = "salsa")
 	@Bean
 	public ServerConfig serverConfig() {
 		return new SalsaSettings();
 	}  
 	
 	@Bean
-	public ServerCluster getRabbitMqServerCluster() {
+	public ServerCluster rabbitMqServerCluster() {
 		return new RabbitMQServerCluster(serverConfig());
+	}
+	
+	@Bean
+	public ClusterHelper clusterHelper() {
+		return new ClusterHelper(rabbitMqServerCluster(), executorService());
 	}
 }
