@@ -51,10 +51,6 @@ public class KongTestService {
 		try {
 			String ip = NetworkService.getIp();
 			
-			//todo: add a additional part:
-				//.newApiRegistration
-				//this will probably also fix the getOrCreate issue in send
-				//when there is no previous object created (null values)
 			this.adapterService.createApiAdapter()
 					.withName("ktsRoot")
 					.withRestPath("kts")
