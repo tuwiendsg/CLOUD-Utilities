@@ -19,24 +19,25 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.DeleteListener
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener.RegisterListener;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.SalsaSettings;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.DeleteApiTask;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Shutdownable;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.RestServiceDiscovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.serverCluster.RabbitMQServerCluster;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.serverCluster.ServerConfig;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.zuul.filters.pre.CustomUsageBalancingFilter;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.zuul.tasks.RegisterApiTask;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.inject.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.netflix.zuul.filters.ProxyRouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -57,6 +58,8 @@ public class SpringConfig {
 	public Provider<RegisterApiTask> registerApiTaskProvider;
 	@Autowired
 	public Provider<DeleteApiTask> deleteApiTaskProvider;
+	@Autowired
+	private ProxyRouteLocator routeLocator;
 	
 	@ConfigurationProperties(prefix = "discovery")
 	@Bean
@@ -94,9 +97,10 @@ public class SpringConfig {
 	@Bean
 	@Scope("prototype")
 	public RegisterApiTask registerApiTask() {
-		return new RegisterApiTask(kongService, 
-				ComotMessagingFactory
-						.getRabbitMqProducer(restServiceDiscovery()));
+//		return new RegisterApiTask(kongService, 
+//				ComotMessagingFactory
+//						.getRabbitMqProducer(restServiceDiscovery()));
+		return new RegisterApiTask(routeLocator, customUsageBalancingFilter());
 	}
 	
 	@Bean
@@ -139,5 +143,10 @@ public class SpringConfig {
 	@Bean
 	public ClusterHelper clusterHelper() {
 		return new ClusterHelper(rabbitMqServerCluster(), executorService());
+	}
+	
+	@Bean
+	public CustomUsageBalancingFilter customUsageBalancingFilter() {
+		return new CustomUsageBalancingFilter();
 	}
 }

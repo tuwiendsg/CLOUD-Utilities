@@ -16,9 +16,7 @@
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.listener;
 
 import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.APIObject;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.RegistryService;
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.tasks.RegisterApiTask;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Consumer;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.zuul.tasks.RegisterApiTask;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import java.util.concurrent.ExecutorService;
 import javax.inject.Provider;

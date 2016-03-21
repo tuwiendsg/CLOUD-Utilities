@@ -59,7 +59,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-<!--		<dependency>
+		<!--		<dependency>
 			<groupId>at.ac.tuwien.dsg.comot</groupId>
 			<artifactId>comot-messaging</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
@@ -81,6 +81,16 @@
 					<artifactId>logback-classic</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-core</artifactId>
+			<version>1.0.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zuul</artifactId>
+			<version>1.0.6.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -140,12 +150,12 @@
 			<scope>test</scope>
 			<type>jar</type>
 		</dependency>
-	 <dependency>
-	  <groupId>at.ac.tuwien.dsg.cloud.salsa</groupId>
-	  <artifactId>salsa-messaging</artifactId>
-	  <version>2.0</version>
-	  <scope>test</scope>
-	  <type>jar</type>
-	 </dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.dsg.cloud.salsa</groupId>
+			<artifactId>salsa-messaging</artifactId>
+			<version>2.0</version>
+			<scope>test</scope>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 </project>

@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,30 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @SpringBootApplication
 @RestController
+@EnableZuulProxy
 public class RegistryService implements ShutdownService {
 
 	private static Logger logger = LoggerFactory.getLogger(RegistryService.class);
 
 	private List<Shutdownable> shutdownables;
-//	private List<AListener> listeners;
-
-//	@Autowired
-//	private Consumer consumer;
-
-//	@Autowired
-//	private KongURIs kongUris;
-//	@Autowired
-//	private DiscoverySettings discoverySettings;
-//	@Autowired
-//	private Provider<DeleteApiTask> deleteApiTaskProvider;
-//	@Autowired
-//	private Provider<RegisterApiTask> registerApiTaskProvider;
-//	@Autowired
-//	private DeleteListener deleteListener;
-//	@Autowired
-//	private RegisterListener registerListener;
-//	@Autowired
-//	private ExecutorService executorService;
 
 	public RegistryService() {
 //		this.listeners = new ArrayList();
@@ -68,55 +52,8 @@ public class RegistryService implements ShutdownService {
 	@PostConstruct
 	public void startup() {
 		logger.trace("Starting post construct.");
-		
-//		this.registerListener(registerListener);
-//		this.registerListener(deleteListener);
-
-//		RestDiscoveryServiceWrapper discovery
-//				= new RestDiscoveryServiceWrapper(discoverySettings, this,
-//						this.executorService);
-//		this.shutdownables.add(discovery);
 	}
 
-//	public void registerListener(AListener listener) {
-//		this.consumer
-//				.withType(listener.getType())
-//				.addMessageReceivedListener(listener);
-//	}
-
-//	public void deleteApi(String id) {
-//		try {
-//			RestTemplate restTemplate = new RestTemplate();
-//			restTemplate.delete(this.kongUris.getKongApiIdUri(id));
-//		} catch (HttpClientErrorException ex) {
-//		}
-//	}
-//
-//	public APIResponseObject registerApi(APIObject apiObject) {
-//		try {
-//			RequestEntity<APIObject> requestEntity = RequestEntity
-//					.put(URI.create(this.kongUris.getKongApisUri()))
-//					.contentType(MediaType.APPLICATION_JSON)
-//					.accept(MediaType.ALL)
-//					.body(apiObject);
-//
-//			RestTemplate restTemplate = new RestTemplate();
-//			ResponseEntity<APIResponseObject> resp = restTemplate
-//					.exchange(requestEntity, APIResponseObject.class);
-//
-//			logger.trace("Response from Kong: {}", resp.getBody());
-//			return resp.getBody();
-//		} catch (HttpStatusCodeException e) {
-//			String serverResp = e.getResponseBodyAsString();
-//			logger.error(String.format("Exception from server! "
-//					+ "Following body was responded %s", serverResp), e);
-//
-//			APIResponseObject resp = new APIResponseObject();
-//			resp.setError(true);
-//			resp.setErrorMsg(serverResp);
-//			return resp;
-//		}
-//	}
 	/**
 	 * @param args the command line arguments
 	 */
@@ -124,17 +61,6 @@ public class RegistryService implements ShutdownService {
 		SpringApplication.run(RegistryService.class, args);
 	}
 
-//	@Override
-//	public void discoveryIsOnline(RestDiscoveryServiceWrapper wrapper) {
-//		logger.trace("Discovery done.");
-//		//this.discovery = new CachingDiscovery(wrapper);
-//		this.shutdownables.remove(wrapper);
-//		this.listeners.add(new RegisterListener(this, registerApiTaskProvider));
-//		this.listeners.add(new DeleteListener(this, deleteApiTaskProvider));
-//	}
-//	public Discovery getDiscovery() {
-//		return this.discovery;
-//	}
 	@RequestMapping("/")
 	public String greeting() {
 		return "Welcome to the Gateway Regestry Service!";
