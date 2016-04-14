@@ -62,20 +62,21 @@ public class ReceivingChannel extends ARabbitChannel {
 		this.queueName = null;
 		try {
 			Channel channel = this.getChannel();
+
 			this.queueName = channel.queueDeclare().getQueue();
 			this.consumer = this.rabbitMqFactory.getQueueingConsumer(channel);
 			channel.basicConsume(queueName, true, consumer);
-			
-			for (String type : types) {
-				this.internalBindType(type);
+
+			synchronized (types) {
+				for (String type : types) {
+					this.internalBindType(type);
+				}
 			}
-		} catch (ChannelException 
-				| IOException
-				| IllegalStateException ex) {
+		} catch (ChannelException | IOException | IllegalStateException ex) {
 			this.reconnect();
 		}
 	}
-	
+
 	private void internalBindType(String type) throws IllegalStateException {
 		try {
 			this.consumer.getChannel().queueBind(queueName,
@@ -86,7 +87,9 @@ public class ReceivingChannel extends ARabbitChannel {
 	}
 
 	public void bindType(String type) throws IllegalStateException {
-		this.types.add(type);
+		synchronized (types) {
+			this.types.add(type);
+		}
 
 		if (this.queueName == null) {
 			return;
@@ -99,17 +102,17 @@ public class ReceivingChannel extends ARabbitChannel {
 		if (this.shutdown.get()) {
 			return null;
 		}
-		
+
 		//this ensures that we start listening for incoming messages
 		//when there is really someone who is interested in listening
 		//this way we ensure a lazy startup
-		if(this.queueName == null) {
+		if (this.queueName == null) {
 			this.reconnect();
 		}
 
 		try {
 			QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			return this.serializer.deserilize(delivery.getBody(), 
+			return this.serializer.deserilize(delivery.getBody(),
 					RabbitMqMessage.class);
 		} catch (IOException |
 				InterruptedException |

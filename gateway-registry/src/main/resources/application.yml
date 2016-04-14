@@ -12,6 +12,7 @@ discovery:
     serviceName: ManualTestRabbitService
 
 salsa:
+    deploy: false
     ip: 128.130.172.215
     port: 8080
     serverCount: 1

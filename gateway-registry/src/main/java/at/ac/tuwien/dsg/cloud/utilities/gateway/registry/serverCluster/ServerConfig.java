@@ -15,4 +15,5 @@ public interface ServerConfig {
 	String getServiceName();
 	int getServerCount();
 	void setServerCount(int count);
+	boolean getDeploy();
 }

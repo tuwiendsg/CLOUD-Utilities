@@ -75,6 +75,7 @@ public class RabbitMqConsumer implements Consumer, Runnable {
 			} else {
 				list = new ArrayList<>();
 				this.messageListeners.put(listener.getType(), list);
+				this.withType(listener.getType());
 			}
 
 			if (this.messageListeners.size() == 1) {

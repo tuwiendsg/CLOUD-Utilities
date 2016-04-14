@@ -14,44 +14,8 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySett
  */
 public class SalsaSettings extends DiscoverySettings implements ServerConfig {
 
-//	@Value("${salsa.ip}")
-//	private String ip;
-//	@Value("${salsa.port}")
-//	private int port;
-//	@Value("${salsa.serviceName}")
-//	private String serviceName;
-//	@Value("${salsa.serverCount}")
 	private int serverCount;
-
-//	@Override
-//	public String getIp() {
-//		return ip;
-//	}
-//
-//	@Override
-//	public void setIp(String ip) {
-//		this.ip = ip;
-//	}
-//
-//	@Override
-//	public int getPort() {
-//		return port;
-//	}
-//
-//	@Override
-//	public void setPort(int port) {
-//		this.port = port;
-//	}
-//
-//	@Override
-//	public String getServiceName() {
-//		return serviceName;
-//	}
-//
-//	@Override
-//	public void setServiceName(String serviceName) {
-//		this.serviceName = serviceName;
-//	}
+	private boolean deploy;
 
 	@Override
 	public int getServerCount() {
@@ -62,5 +26,13 @@ public class SalsaSettings extends DiscoverySettings implements ServerConfig {
 	public void setServerCount(int serverCount) {
 		this.serverCount = serverCount;
 	}
-	
+
+	public void setDeploy(boolean deploy) {
+		this.deploy = deploy;
+	}
+
+	@Override
+	public boolean getDeploy() {
+		return deploy;
+	}
 }
