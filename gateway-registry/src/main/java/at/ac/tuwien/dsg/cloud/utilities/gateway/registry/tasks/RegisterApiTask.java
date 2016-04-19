@@ -21,12 +21,15 @@ import at.ac.tuwien.dsg.cloud.utilities.gateway.adapter.model.ChannelWrapper;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.KongService;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongApiObject;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongApiResponseObject;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongPlugin;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.DecisionSettings;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Message;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Producer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -38,20 +41,36 @@ public class RegisterApiTask extends ATask<ChannelWrapper<APIObject>> {
 	
 	private final KongService kongService;
 	private final Producer producer;
-	//private final Serializer
+	private List<KongPlugin> plugins = new ArrayList<>();
 	
-	public RegisterApiTask(KongService service, Producer producer) {
+	public RegisterApiTask(KongService service, Producer producer, 
+			DecisionSettings decisionSettings) {
 		this.kongService = service;
 		this.producer = producer;
+		
+		KongPlugin authPlugin = new KongPlugin();
+		authPlugin.setName("key-auth");
+		KongPlugin restDecisionPlugin = new KongPlugin();
+		restDecisionPlugin.setName("restDecisionPlugin");
+		restDecisionPlugin.addConfigProperty("url", decisionSettings.asUrl());
+		
+		plugins.add(authPlugin);
+		plugins.add(restDecisionPlugin);
 	}
 
 	@Override
 	public void run() {
 		try {
-			KongApiResponseObject resp = this.kongService
-					.registerApi(KongApiObject
-					.fromApiObject(this.wrapper.getBody()));
+			KongApiObject apiObject = KongApiObject
+					.fromApiObject(this.wrapper.getBody());
+			KongApiResponseObject resp = this.kongService.registerApi(apiObject);
 			
+			if(!resp.isError()) {
+				for(KongPlugin p: this.plugins) {
+					this.kongService.enablePlugin(apiObject, p);
+				}
+			}
+
 			ObjectMapper mapper = new ObjectMapper();
 			
 			Message response = ComotMessagingFactory

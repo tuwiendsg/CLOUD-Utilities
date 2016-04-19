@@ -50,5 +50,5 @@ public interface Message {
 	
 	String getMessageKey();
 	
-	Message withMessageKey(String key);
+	Message setMessageKey(String key);
 }

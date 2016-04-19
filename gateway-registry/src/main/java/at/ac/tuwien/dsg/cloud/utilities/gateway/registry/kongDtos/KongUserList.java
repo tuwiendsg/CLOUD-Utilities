@@ -6,6 +6,7 @@
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +15,10 @@ import java.util.List;
  */
 public class KongUserList {
 	public List<KongUser> users;
+	
+	public KongUserList() {
+		this.users = new ArrayList<>();
+	}
 
 	@JsonProperty("data")
 	public List<KongUser> getUsers() {

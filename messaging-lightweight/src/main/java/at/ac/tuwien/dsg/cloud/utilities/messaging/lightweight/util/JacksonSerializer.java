@@ -15,6 +15,7 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class JacksonSerializer implements Serializer {
 	
 	public JacksonSerializer() {
 		mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
 	@Override

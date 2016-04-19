@@ -112,11 +112,28 @@ public class UserControllerTest {
 								MediaType.APPLICATION_JSON.toString())
 						.withBody(readJsonFileHelper("User.json"))));
 		
+		String keyUri = KongURIs.KONG_CONSUMERS_URI 
+				+ "/max" 
+				+ KongURIs.KONG_CONSUMER_KEY_AUTH;
+		
+		kong.stubFor(WireMock
+				.post(WireMock
+						.urlEqualTo(keyUri))
+				.willReturn(WireMock
+						.aResponse()
+						.withStatus(201)
+						.withHeader("Content-Type", 
+								MediaType.APPLICATION_JSON.toString())
+						.withBody(readJsonFileHelper("UserKeyAuth.json"))));
+		
 		String maxPath = UserController.REST_CONTROLLER_PATH + "/max";
 		
 		mock.perform(MockMvcRequestBuilders
 				.put(URI.create(maxPath)))
-				.andExpect(MockMvcResultMatchers.status().isOk());
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers
+						.content()
+						.string("62eb165c070a41d5c1b58d9d3d725ca1"));
 
 		kong.stubFor(WireMock
 				.post(WireMock

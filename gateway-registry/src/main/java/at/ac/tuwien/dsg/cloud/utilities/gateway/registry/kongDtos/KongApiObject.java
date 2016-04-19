@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class KongApiObject extends APIObject {
 	
-	private String publicDns;
+	private String publicDns = "";
 	private boolean stripPath;
 	private boolean preserveHost;
 	

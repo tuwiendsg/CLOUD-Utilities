@@ -15,20 +15,16 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * 
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
-@Component
-public class KongSettings {
-	@Value("${kong.ip}")
-	private String ip;
-	@Value("${kong.port}")
-	private int port;
+public class ServiceSettings {
+	protected String ip;
+	protected int port;
 	
 	public String getIp() {
 		return ip;
@@ -44,5 +40,13 @@ public class KongSettings {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+	
+	public String asUrl() {
+		try {
+			return (new URL("http", ip, port, "")).toString();
+		} catch (MalformedURLException ex) {
+			throw new RuntimeException("Malformed config!", ex);
+		}
 	}
 }

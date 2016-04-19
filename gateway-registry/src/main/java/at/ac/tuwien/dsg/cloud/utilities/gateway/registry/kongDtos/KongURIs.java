@@ -5,8 +5,10 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos;
 
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.KongSettings;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.ServiceSettings;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,11 +20,13 @@ public class KongURIs {
 
 	public static final String KONG_APIS_URI = "/apis";
 	public static final String KONG_CONSUMERS_URI = "/consumers";
+	public static final String KONG_PLUGINS_URI = "/plugins";
+	public static final String KONG_CONSUMER_KEY_AUTH = "/key-auth";
 
-	private KongSettings kongSettings;
+	private ServiceSettings kongSettings;
 
 	@Autowired
-	public KongURIs(KongSettings settings) {
+	public KongURIs(@Qualifier("kongSettings") ServiceSettings settings) {
 		this.kongSettings = settings;
 	}
 
@@ -52,5 +56,15 @@ public class KongURIs {
 
 	public String getKongConsumerIdUri(String id) {
 		return this.getBasicCombo(this.getKongConsumersUri(), id);
+	}
+	
+	public String getKongPluginsForApiUri(String api) {
+		return this.getBasicCombo(this.getKongApisUri(), 
+				this.getBasicCombo(api, KONG_PLUGINS_URI));
+	}
+	
+	public String getKongKeyForConsumerUri(String user) {
+		return this.getBasicCombo(this.getBasicCombo(this.getKongConsumersUri(), 
+				user), KONG_CONSUMER_KEY_AUTH);
 	}
 }

@@ -25,12 +25,12 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.ServerCluster;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Shutdownable;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.ComotMessagingFactory;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.RestServiceDiscovery;
-import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.JacksonSerializer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.serverCluster.RabbitMQServerCluster;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.serverCluster.ServerConfig;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.DecisionSettings;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.ServiceSettings;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,6 +49,8 @@ import org.springframework.context.annotation.Scope;
 public class SpringConfig {
 	
 	@Autowired
+	private SpringPropertiesConfig propertiesConfig;
+	@Autowired
 	private KongService kongService;
 	@Autowired
 	private RegistryService regestryService;
@@ -58,15 +60,12 @@ public class SpringConfig {
 	@Autowired
 	public Provider<DeleteApiTask> deleteApiTaskProvider;
 	
-	@ConfigurationProperties(prefix = "discovery")
-	@Bean
-	public DiscoverySettings discoverySettings() {
-		return new DiscoverySettings();
-	}
+	
 	
 	@Bean
-	public Discovery restServiceDiscovery() {
-		return new RestServiceDiscovery(discoverySettings(), 
+	public Discovery serviceDiscovery() {		
+		return ComotMessagingFactory.getServiceDiscovery(propertiesConfig
+				.discoverySettings(), 
 				jacksonSerializer());
 	}
 	
@@ -74,7 +73,7 @@ public class SpringConfig {
 	public Consumer consumer() {
 		//todo: check consumer for shutdown?!
 		Consumer bean = ComotMessagingFactory
-				.getRabbitMqConsumer(restServiceDiscovery());
+				.getRabbitMqConsumer(serviceDiscovery());
 		bean.addMessageReceivedListener(registerListener());
 		bean.addMessageReceivedListener(deleteListener());
 		return bean;
@@ -96,7 +95,8 @@ public class SpringConfig {
 	public RegisterApiTask registerApiTask() {
 		return new RegisterApiTask(kongService, 
 				ComotMessagingFactory
-						.getRabbitMqProducer(restServiceDiscovery()));
+						.getRabbitMqProducer(serviceDiscovery()),
+				propertiesConfig.decisionSettings());
 	}
 	
 	@Bean

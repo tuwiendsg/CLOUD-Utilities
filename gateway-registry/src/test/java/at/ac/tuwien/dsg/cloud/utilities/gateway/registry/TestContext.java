@@ -5,10 +5,11 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry;
 
-import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.KongSettings;
+import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.settings.ServiceSettings;
 import at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos.KongURIs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -27,9 +28,12 @@ public class TestContext {
 	@Autowired
 	Environment env;
 
-	@Bean
-	public KongSettings kongSettings() {
-		return new KongSettings();
+	@Bean(name = "kongSettings")
+	public ServiceSettings kongSettings() {
+		ServiceSettings settings = new ServiceSettings();
+		settings.setIp("127.0.0.1");
+		settings.setPort(8001);
+		return settings;
 	}
 
 	@Bean
@@ -41,21 +45,15 @@ public class TestContext {
 	public RestUtilities restUtilities() {
 		return new RestUtilities();
 	}
+	
+	@Bean
+	public KongService kongService() {
+		return new KongService(kongURIs(), restUtilities());
+	}
 
 	@Bean
 	@Lazy
 	public UserController userController() {
-		return new UserController(kongURIs(), restUtilities());
-	}
-
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer placeHolderConfigurer() {
-		PropertySourcesPlaceholderConfigurer conf = new PropertySourcesPlaceholderConfigurer();
-
-		YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-		yaml.setResources(new ClassPathResource("application.yml"));
-		
-		conf.setProperties(yaml.getObject());
-		return conf;
+		return new UserController(kongURIs(), restUtilities(), kongService());
 	}
 }

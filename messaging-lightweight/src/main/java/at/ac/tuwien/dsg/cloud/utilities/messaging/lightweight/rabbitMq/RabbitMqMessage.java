@@ -78,7 +78,7 @@ public class RabbitMqMessage extends TypeHandler<RabbitMqMessage>
 	}
 
 	@Override
-	public Message withMessageKey(String key) {
+	public Message setMessageKey(String key) {
 		this.key = key;
 		return this;
 	}

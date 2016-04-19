@@ -20,7 +20,7 @@ public class GatewayAdapterFactory {
 
 	public static AdapterService adapterServiceImpl(DiscoverySettings settings) {
 		Discovery discovery = ComotMessagingFactory
-				.getRestServiceDiscovery(settings);
+				.getServiceDiscovery(settings);
 
 		Provider<Message> provider = new Provider<Message>() {
 			@Override

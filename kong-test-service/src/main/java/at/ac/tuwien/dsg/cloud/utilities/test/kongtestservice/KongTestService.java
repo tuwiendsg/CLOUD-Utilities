@@ -53,7 +53,7 @@ public class KongTestService {
 			
 			this.adapterService.createApiAdapter()
 					.withName("ktsRoot")
-					.withRestPath("kts")
+					.withRestPath("/kts")
 					.withTargetUrl(String.format("http://%s:8080", ip))
 					.send();
 		} catch (SocketException ex) {
@@ -67,6 +67,7 @@ public class KongTestService {
 	public void shutdown(){
 		//todo: blocking mode is needed in here
 			//or is it?
+		logger.debug("In destruction!");
 		this.adapterService.unregisterAllApis();
 	}
 

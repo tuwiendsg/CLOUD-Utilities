@@ -5,6 +5,7 @@
  */
 package at.ac.tuwien.dsg.cloud.utilities.gateway.registry.kongDtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ public class KongUser {
 	private String userName;
 	private long createdAt;
 	private String id;
+	private KongUserKeyObject key;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -79,5 +81,14 @@ public class KongUser {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@JsonIgnore
+	public KongUserKeyObject getKey() {
+		return key;
+	}
+
+	public void setKey(KongUserKeyObject key) {
+		this.key = key;
 	}
 }

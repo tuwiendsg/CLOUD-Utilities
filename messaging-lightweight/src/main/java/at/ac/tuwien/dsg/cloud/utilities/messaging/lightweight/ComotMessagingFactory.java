@@ -17,6 +17,7 @@ package at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight;
 
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.CachingProducer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.api.Discovery;
+import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.DirectDiscovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.discovery.RestServiceDiscovery;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqConsumer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqFactory;
@@ -24,12 +25,17 @@ import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqM
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.rabbitMq.RabbitMqProducer;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.DiscoverySettings;
 import at.ac.tuwien.dsg.cloud.utilities.messaging.lightweight.util.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Svetoslav Videnov <s.videnov@dsg.tuwien.ac.at>
  */
 public class ComotMessagingFactory {
+	
+	private static Logger logger = 
+			LoggerFactory.getLogger(ComotMessagingFactory.class);
 
 	public static RabbitMqConsumer getRabbitMqConsumer(Discovery discovery) {
 		Serializer serializer = ComotMessagingHelperFactory
@@ -59,9 +65,20 @@ public class ComotMessagingFactory {
 	public static RabbitMqMessage getRabbitMqMessage() {
 		return new RabbitMqMessage();
 	}
-
-	public static Discovery getRestServiceDiscovery(DiscoverySettings settings) {
-		return new RestServiceDiscovery(settings,
+	
+	public static Discovery getServiceDiscovery(DiscoverySettings settings) {
+		return getServiceDiscovery(settings, 
 				ComotMessagingHelperFactory.getJacksonSerializer());
+	}
+
+	public static Discovery getServiceDiscovery(DiscoverySettings settings,
+			Serializer serializer) {
+		if (settings.getServiceName() == null) {
+			logger.info("No discovery service name configured. "
+					+ "Wireing direct discovery!");
+			return new DirectDiscovery(settings);
+		}
+		
+		return new RestServiceDiscovery(settings, serializer);
 	}
 }

@@ -42,11 +42,14 @@ public class UserController {
 
 	private KongURIs kongUris;
 	private RestUtilities restUtilities;
+	private KongService kongService;
 
 	@Autowired
-	public UserController(KongURIs kongURIs, RestUtilities restUtilities) {
+	public UserController(KongURIs kongURIs, RestUtilities restUtilities, 
+			KongService kongService) {
 		this.kongUris = kongURIs;
 		this.restUtilities = restUtilities;
+		this.kongService = kongService;
 	}
 
 	@PostConstruct
@@ -69,7 +72,7 @@ public class UserController {
 	public boolean check(@RequestBody String user) {
 		logger.info("User {} requested authentication check!", user);
 		return this.kongUsers.getUsers().stream().anyMatch((u)
-				-> u.getUserName().equals(user));
+				-> u.getUserName().equals(user) || u.getId().equals(user));
 	}
 
 	@RequestMapping(method = RequestMethod.PUT,
@@ -87,9 +90,17 @@ public class UserController {
 		if (resp == null || resp.getStatusCode() != HttpStatus.CREATED) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		this.kongUsers.getUsers().add(resp.getBody());
-		return new ResponseEntity<>(HttpStatus.OK);
+		
+		KongUser kongUser = resp.getBody();
+		kongUser.setKey(kongService.createKeyForUser(kongUser.getUserName()));
+		
+		if(kongUser.getKey() == null) {
+			return new ResponseEntity<>("User was created but key generation failed!",
+					HttpStatus.FAILED_DEPENDENCY);
+		}
+		
+		this.kongUsers.getUsers().add(kongUser);
+		return new ResponseEntity(kongUser.getKey().getKey(), HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE,

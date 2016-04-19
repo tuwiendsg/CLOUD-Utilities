@@ -1,7 +1,7 @@
 local access = require("access")
 
 config = { method="POST", 
-			url="http://127.0.0.1:8080/",
+			url="http://127.0.0.1:8280/users/check",
 			contentType="text/plain" }
 
 print(access.request(config, "sveti"))

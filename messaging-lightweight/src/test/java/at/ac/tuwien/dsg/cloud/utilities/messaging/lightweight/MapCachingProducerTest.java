@@ -24,7 +24,7 @@ public class MapCachingProducerTest {
 	public void testSendMessage() {
 		
 		Message message = new RabbitMqMessage();
-		message.withMessageKey("myKey");
+		message.setMessageKey("myKey");
 		HashMap<String, Message> actual = new HashMap<>();
 		
 		Producer producerMock = mock(Producer.class);
@@ -45,7 +45,7 @@ public class MapCachingProducerTest {
 	public void testSimulateSendMessage() {
 		
 		Message message = new RabbitMqMessage();
-		message.withMessageKey("myKey");
+		message.setMessageKey("myKey");
 		HashMap<String, Message> actual = new HashMap<>();
 		actual.put("myKey", message);
 

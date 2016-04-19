@@ -87,7 +87,7 @@ public class AdapterServiceImpl implements AdapterService,
 			Message message = this.messageProvider
 					.get()
 					.withType("registerApiChannel")
-					.withMessageKey(api.getTargetUrl())
+					.setMessageKey(api.getTargetUrl())
 					.setMessage(this.serializer.serialze(wrappedMsg));
 
 			this.producer.sendMessage(message);

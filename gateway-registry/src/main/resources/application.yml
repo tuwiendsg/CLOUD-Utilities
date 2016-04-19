@@ -1,16 +1,29 @@
 ## Application properties for gateway registry
 ---
-# IP + Port of Kong API
+# ip and port of Kong
 kong:
     ip: 127.0.0.1
     port: 8001
 
-# IP + Port of Discovery + the name of the rabbitMqClusterService
+# Discovery configuration
+# ip			- the ip of the discovery service or of the RabbitMQ Server
+# port			- (optional) only needed if used with a discovery; 
+#					the port of the	discovery service
+# serviceName	- (optional) only needed if used with a discovery service;
+#					the name of the RabbitMQ Service on SALSA;
+#					if no service name is provided the gateway will 
+#					try for a direct connection
 discovery:
     ip: 127.0.0.1
-    port: 8580
-    serviceName: ManualTestRabbitService
+#    port: 8580
+#    serviceName: ManualTestRabbitService
 
+# SALSA configuration
+# ip,port		- ip and port of SALSA
+# deploy		- if the gateway service shall attempt to automatically 
+#					deploy the RabbitMQ Service
+# serverCount	- how many RabbitMQ nodes should be deployed
+# serviceName	- the name of the RabbitMQ Service on SALSA
 salsa:
     deploy: false
     ip: 128.130.172.215
@@ -18,9 +31,15 @@ salsa:
     serverCount: 1
     serviceName: ManualTestRabbitService
 
-# Port on which the gateway registry will be available
+# port on which the gateway registry will be available
 server:
     port: 8280
+   
+# ip, port and REST path of the decision service to use
+decision:
+    ip: 127.0.0.1
+    port: 8280
+    restPath: /users/check
 
 # Log levels
 logging:
