@@ -1,12 +1,12 @@
-## Application properties for gateway registry
+## Application properties for the discovery service
 ---
-# IP + Port of SALSA + the name of the rabbitMqClusterService
+# SALSA configuration
+# ip,port		- ip and port of SALSA
 salsa:
     ip: 128.130.172.215
     port: 8080
-    serviceName: ManualTestRabbitService
 
-# Port on which the gateway registry will be available
+# port on which the discovery service will be available
 server:
     port: 8580
 

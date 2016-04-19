@@ -38,6 +38,11 @@ For more detailed descriptions please read the READMEs of the different tools.
 
 	This is a small test service which will register an usable API at the gateway for demonstration purpose.
 
+7. **SALSA Discovery Service**
+
+	This service utilizes the SALSA API to provide discovery for services deployed by SALSA.
+
+
 ## Installation
 
 For running the dynamic gateway where services can register and unregister as they are spawned you will need to provide the following additional components:
@@ -47,7 +52,7 @@ For running the dynamic gateway where services can register and unregister as th
 Afterwards you only need to start the Gateway Registry.
 
 ### Deploying Kong
-It is recomended to use the provided Kong Docker containers.
+It is recommended to use the provided Kong Docker containers.
 For installing Kong on a local machine please refer to the Kong manuals.
 The current version is tested with Kong 0.7.0.
 
@@ -84,7 +89,7 @@ docker run -d --hostname my-rabbit --name some-rabbit rabbitmq:management
 
 ### Configuring the Gateway Registry
 The Gateway Registry configuration can be changed by simply putting an `application.yml` file beside the Gateway jar-package.
-When starting the Gateway it will outomatically prefer the configuration out side of the package to the one inside.
+When starting the Gateway it will automatically prefer the configuration out side of the package to the one inside.
 
 To run the Gateway simple execute the `java -jar gateway-registry-0.0.1-SNAPSHOT.jar` command.
 
@@ -141,7 +146,7 @@ logging:
 ```
 
 ### Running the Kong Test Service
-After the Gateway is up an running you can start the Kong Test Service again by emiting the `java -jar kong-test-service-0.0.1-SNAPSHOT.jar` command.
+After the Gateway is up an running you can start the Kong Test Service again by emitting the `java -jar kong-test-service-0.0.1-SNAPSHOT.jar` command.
 The Test Service will then if everything is properly configured register an API call at the Gateway.
 The Test Service can also be configured by an `application.yml` file.
 
@@ -181,4 +186,29 @@ curl -X PUT http://127.0.0.1:8280/users/{username}
 
 This will register a user with the given username and return an API key for this user.
 This key can then be used to query the registered APIs in the following ways.
-In a web browser simply append `?apikey={key}` and from commandline by adding `-H 'apikey: {key}'` to the request headers.
+In a web browser simply append `?apikey={key}` and from command line by adding `-H 'apikey: {key}'` to the request headers.
+
+### Running the SALSA Discovery Service
+The SALSA Discovery Service can be started like the other mentioned services by using the `java -jar salsa-discovery-service-0.0.1-SNAPSHOT.jar` command.
+It can also be configured by an application.yml file.
+
+```YML
+## Application properties for the discovery service
+---
+# SALSA configuration
+# ip,port		- ip and port of SALSA
+salsa:
+    ip: 128.130.172.215
+    port: 8080
+
+# port on which the discovery service will be available
+server:
+    port: 8580
+
+# Log levels
+logging:
+    level:
+        at:
+            ac:
+                tuwien: TRACE
+```

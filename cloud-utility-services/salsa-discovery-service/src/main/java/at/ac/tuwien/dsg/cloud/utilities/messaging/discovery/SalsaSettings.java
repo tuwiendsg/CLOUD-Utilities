@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class SalsaSettings {
 	private String ip;
 	private int port;
-	private String serviceName;
+	private String serviceName = "";
 
 	public String getIp() {
 		return ip;
