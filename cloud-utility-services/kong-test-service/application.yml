@@ -1,0 +1,18 @@
+## Application properties for gateway registry
+---
+# IP + Port of Discovery + the name of the rabbitMqClusterService
+discovery:
+    ip: 172.17.0.2
+    port: 8580
+#    serviceName: ManualTestRabbitService
+
+# Port on which the gateway registry will be available
+server:
+    port: 8080
+
+# Log levels
+logging:
+    level:
+        at:
+            ac:
+                tuwien: TRACE

@@ -1,0 +1,18 @@
+## Application properties for the discovery service
+---
+# SALSA configuration
+# ip,port		- ip and port of SALSA
+salsa:
+    ip: 128.130.172.215
+    port: 8080
+
+# port on which the discovery service will be available
+server:
+    port: 8580
+
+# Log levels
+logging:
+    level:
+        at:
+            ac:
+                tuwien: TRACE

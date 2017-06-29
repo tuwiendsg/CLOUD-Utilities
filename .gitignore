@@ -1,8 +1,3 @@
-/messaging-api/target/
-/messaging-lightweight/target/
-/messaging/target/
-/gateway-adapter/target/
-/gateway-registry/target/
-/gateway-registry/nbproject/
-/messaging-lightweight/nbproject/
+nbproject
+target
 /local-test-discovery-service/target/
